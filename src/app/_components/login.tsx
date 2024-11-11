@@ -3,7 +3,6 @@ import { signIn } from "next-auth/react";
 // import { useState } from "react";
 import { Input } from "@components/ui/input";
 import { Label } from "~/components/ui/label";
-import { Button } from "~/components/ui/button";
 import Image from "next/image";
 
 export default function LogInPage() {
@@ -43,7 +42,7 @@ export default function LogInPage() {
           // onClick={handleEmailSignIn}
           className="w-full rounded-md bg-blue-500 p-3 font-semibold text-white hover:bg-blue-600"
         >
-          Continue
+          Log In
         </button>
 
         {/* Divider */}
