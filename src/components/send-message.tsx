@@ -1,5 +1,6 @@
 // import { Button } from "@components/ui/button";
 import { CircleArrowRight } from "lucide-react";
+import ShineBorder from "./ui/shine-border";
 
 export function SendMessage() {
   return (
@@ -22,16 +23,22 @@ export function SendMessage() {
       </div> */}
 
       <div className="flex items-center overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-        <textarea
-          id="newMessage"
-          className="w-full resize-none border-none bg-inherit p-4 focus:outline-none sm:text-sm"
-          rows={1}
-          placeholder="Send a Message to TextMate"
-        ></textarea>
-        <div className="flex items-center gap-2 p-4">
-          {/* <Button variant="secondary">Clear</Button> */}
-          <CircleArrowRight className="text-lg" />
-        </div>
+        <ShineBorder
+          className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border bg-background md:shadow-xl"
+          color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
+        >
+          {" "}
+          <textarea
+            id="newMessage"
+            className="w-full resize-none border-none bg-inherit p-4 focus:outline-none sm:text-sm"
+            rows={1}
+            placeholder="Send a Message to TextMate"
+          ></textarea>
+          <div className="flex items-center gap-2 p-4">
+            {/* <Button variant="secondary">Clear</Button> */}
+            <CircleArrowRight className="text-lg" />
+          </div>
+        </ShineBorder>
       </div>
     </div>
   );

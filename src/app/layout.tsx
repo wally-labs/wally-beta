@@ -9,6 +9,7 @@ import { AppSidebar } from "@components/app-sidebar";
 import { MainDropdown } from "../components/main-dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
+// import ShineBorder from "@components/ui/shine-border";
 
 export const metadata: Metadata = {
   title: "Wally",

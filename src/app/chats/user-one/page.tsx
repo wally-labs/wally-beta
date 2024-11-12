@@ -36,6 +36,9 @@ export default async function Home() {
           </div>
           <div>
             <h2 className="text-3xl font-bold text-red-600">Samantha 🌹</h2>
+            <h3 className="text-center text-xl font-semibold text-red-600">
+              Fiance
+            </h3>
           </div>
           <div>
             <ProfileDropdown />
