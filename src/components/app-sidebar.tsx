@@ -12,25 +12,12 @@ import {
   SidebarMenuItem,
 } from "@components/ui/sidebar";
 
-import {
-  ChevronUp,
-  CircleUserRound,
-  LogOut,
-  MessageCircle,
-  Settings,
-  UserCircle2Icon,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@components/ui/dropdown-menu";
+import { CircleUserRound, MessageCircle, Settings } from "lucide-react";
 
 const chats = [
   {
-    title: "Chat #1",
-    url: "#",
+    title: "Samantha",
+    url: "/chats/user-one",
     icon: CircleUserRound,
   },
   {
@@ -72,31 +59,15 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="mb-4">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <Settings />
-                  Settings
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem>
-                  <UserCircle2Icon />
-                  <span>My Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <LogOut />
-                  <span>Sign Out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <SidebarMenuItem key={"user-profile"} className="mx-auto">
+            <SidebarMenuButton asChild>
+              <a href="#">
+                <Settings />
+                <span>Configure Profile</span>
+              </a>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

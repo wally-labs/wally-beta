@@ -7,6 +7,8 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { SidebarProvider, SidebarTrigger } from "@components/ui/sidebar";
 import { AppSidebar } from "@components/app-sidebar";
 import { MainDropdown } from "../components/main-dropdown";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 
 export const metadata: Metadata = {
   title: "Wally",
@@ -24,11 +26,16 @@ export default function RootLayout({
           <SidebarProvider>
             <AppSidebar />
             <main style={{ flexGrow: 1 }}>
-              <div className="fixed top-0 flex items-center space-x-4 p-4">
-                <SidebarTrigger />
-                <MainDropdown />
+              <div className="fixed top-0 flex w-full items-center justify-between p-4">
+                <div className="flex items-center space-x-4">
+                  <SidebarTrigger />
+                  <MainDropdown />
+                </div>
+                <div className="flex items-center space-x-4">
+                  <FontAwesomeIcon icon={faCircleUser} color="black" />
+                </div>
               </div>
-              {children}
+              <div className="mt-4">{children}</div>
             </main>
           </SidebarProvider>
         </TRPCReactProvider>
