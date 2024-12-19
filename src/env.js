@@ -16,7 +16,7 @@ export const env = createEnv({
     AUTH_DISCORD_SECRET: z.string().optional().nullable(),
     GOOGLE_ID: z.string().optional().nullable(),
     GOOGLE_SECRET: z.string().optional().nullable(),
-    DATABASE_URL: z.string().url(),
+    POSTGRES_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -41,7 +41,7 @@ export const env = createEnv({
     AUTH_DISCORD_SECRET: process.env.AUTH_DISCORD_SECRET ?? undefined,
     GOOGLE_ID: process.env.AUTH_GOOGLE_ID ?? undefined,
     GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET ?? undefined,
-    DATABASE_URL: process.env.DATABASE_URL,
+    POSTGRES_URL: process.env.POSTGRES_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

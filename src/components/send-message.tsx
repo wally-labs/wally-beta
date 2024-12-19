@@ -1,8 +1,45 @@
 // import { Button } from "@components/ui/button";
 import { CircleArrowRight } from "lucide-react";
 import ShineBorder from "./ui/shine-border";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
+
+interface Emotion {
+  emotion: string;
+  emoji: string;
+  link: string;
+}
 
 export function SendMessage() {
+  const emotions: Emotion[] = [
+    {
+      emotion: "Happy",
+      emoji: "😊",
+      link: "#",
+    },
+    {
+      emotion: "Sad",
+      emoji: "😔",
+      link: "#",
+    },
+    {
+      emotion: "Angry",
+      emoji: "😡",
+      link: "#",
+    },
+    {
+      emotion: "Romantic",
+      emoji: "🌹",
+      link: "#",
+    },
+  ];
+
   return (
     <div>
       <label htmlFor="newMessage" className="sr-only">
@@ -36,7 +73,23 @@ export function SendMessage() {
           ></textarea>
           <div className="flex items-center gap-2 p-4">
             {/* <Button variant="secondary">Clear</Button> */}
-            <CircleArrowRight className="text-lg" />
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <CircleArrowRight className="text-lg" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Emotions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {emotions.map((e) => {
+                  return (
+                    <DropdownMenuItem key={e.emotion}>
+                      {e.emotion}
+                      <span>{e.emoji}</span>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </ShineBorder>
       </div>

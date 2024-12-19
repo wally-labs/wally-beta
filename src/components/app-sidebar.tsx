@@ -12,7 +12,12 @@ import {
   SidebarMenuItem,
 } from "@components/ui/sidebar";
 
-import { CircleUserRound, MessageCircle, Settings } from "lucide-react";
+import {
+  CircleUserRound,
+  HomeIcon,
+  MessageCircle,
+  Settings,
+} from "lucide-react";
 
 const chats = [
   {
@@ -32,11 +37,26 @@ const chats = [
   },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ children }: { children: React.ReactNode }) {
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader></SidebarHeader>
+      <div className="top-0 flex w-full items-center justify-between p-3">
+        {children}
+      </div>
+      <SidebarHeader className="p-0"></SidebarHeader>
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href={"/"}>
+                  <HomeIcon />
+                  <span>Home</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Chats</SidebarGroupLabel>
           <SidebarGroupContent>
