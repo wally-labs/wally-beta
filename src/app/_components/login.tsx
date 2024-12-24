@@ -14,8 +14,8 @@ export default function LogInPage() {
   //   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md space-y-6 rounded-md bg-white p-8 shadow-md">
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-md space-y-6 rounded-md bg-[#f8f8f8] p-8 shadow-md">
         <h1 className="mb-6 text-center text-2xl font-bold">Welcome back!</h1>
 
         {/* Email and Password Fields */}

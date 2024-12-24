@@ -8,7 +8,7 @@ import {
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { Gem } from "lucide-react";
 
-export function MainDropdown() {
+export function ModelDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>TextMate 1.0</DropdownMenuTrigger>
