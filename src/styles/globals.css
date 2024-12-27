@@ -36,6 +36,8 @@
     --sidebar-accent-foreground: 240 5.9% 10%; /* Deep slate blue */
     --sidebar-border: 220 13% 91%; /* Pale blue-gray */
     --sidebar-ring: 217.2 91.2% 59.8%; /* Vibrant blue */
+    --amber-theme: 38.5 89.3% 63.9%; /* Warm golden yellow */
+    --amber-theme-darker: 39 94% 67%; /* Warm dark yellow */
   }
   .dark {
     --background: 0 0% 3.9%; /* Almost black */

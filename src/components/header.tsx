@@ -19,7 +19,7 @@ export function Header({
         <div className="space-x-4">
           <SignedOut>
             <SignInButton>
-              <Button variant="blue">Sign In</Button>
+              <Button variant="main">Sign In</Button>
             </SignInButton>
           </SignedOut>
           <SignedIn>

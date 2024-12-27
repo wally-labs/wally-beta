@@ -4,8 +4,19 @@ import { SignIn } from "@clerk/nextjs";
 export default function CustomSignIn() {
   // return <LogInPage />;
   return (
-    <div>
-      <SignIn />
+    <div className="flex items-center justify-center">
+      <SignIn
+        appearance={{
+          elements: {
+            formButtonPrimary:
+              "bg-amberTheme hover:bg-amberTheme-darker border-amberTheme",
+          },
+          layout: {
+            socialButtonsPlacement: "bottom",
+            logoImageUrl: "/favicon.ico",
+          },
+        }}
+      />
     </div>
   );
 }
