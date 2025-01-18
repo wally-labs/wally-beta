@@ -16,28 +16,24 @@ import {
   CircleUserRound,
   HomeIcon,
   MessageCircle,
+  Plus,
   Settings,
 } from "lucide-react";
+import { api } from "~/trpc/react";
 
-const chats = [
-  {
-    title: "Samantha",
-    url: "/chats/user-one",
-    icon: CircleUserRound,
-  },
-  {
-    title: "Chat #2",
-    url: "#",
-    icon: CircleUserRound,
-  },
-  {
-    title: "Chat #3",
-    url: "#",
-    icon: CircleUserRound,
-  },
-];
+// const chats = [
+//   {
+//     title: "Samantha",
+//     url: "/chats/user-one",
+//     icon: CircleUserRound,
+//   },
+// ];
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
+  const { data } = api.user.getAllChatHeaders.useQuery(undefined, {
+    refetchOnWindowFocus: true,
+  });
+
   return (
     <Sidebar collapsible="icon">
       <div className="top-0 flex w-full items-center justify-between p-3">
@@ -65,16 +61,24 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
               <span className="sr-only">Start a New Chat!</span>
             </SidebarGroupAction>
             <SidebarMenu>
-              {chats.map((chat) => (
-                <SidebarMenuItem key={chat.title}>
+              {data?.map((chat) => (
+                <SidebarMenuItem key={chat.id}>
                   <SidebarMenuButton asChild>
-                    <a href={chat.url}>
-                      <chat.icon />
-                      <span>{chat.title}</span>
+                    <a href={chat.id}>
+                      <CircleUserRound />
+                      <span>{chat.chatHeader}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="create-chat">
+                    <Plus />
+                    <span>New Chat</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
