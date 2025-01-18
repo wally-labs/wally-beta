@@ -69,6 +69,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    chats         Chat[]   
 }
 
 model VerificationToken {
@@ -77,4 +78,55 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// Necessary for Wally 
+model Chat {
+    id         String   @id @default(cuid())
+    userId     String
+    profileId  String   @unique
+    chatHeader String
+
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    messages   Messages[]
+    profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    
+    @@index([userId])
+}
+
+model Profile {
+    id           String    @id @default(cuid())
+    chatId       String    @unique
+
+    name         String
+    birthDate    DateTime? @default(now())
+    relationship String
+    heartLevel   Int       @default(1) 
+    race         String? 
+    country      String?
+    language     String
+
+    chat         Chat?     @relation
+
+    @@index([chatId])
+}
+
+enum Sender {
+    USER
+    WALLY
+}
+
+model Messages {
+    id        String   @id @default(cuid())
+    chatId    String
+    content   String
+    messageBy Sender
+
+    createdAt DateTime @default(now())
+    chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+    @@index([chatId])
 }
