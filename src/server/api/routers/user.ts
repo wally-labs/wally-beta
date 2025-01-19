@@ -28,6 +28,6 @@ export const userRouter = createTRPCRouter({
       },
     });
 
-    return headers ?? [];
+    return headers;
   }),
 });

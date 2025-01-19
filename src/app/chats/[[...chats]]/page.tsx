@@ -3,9 +3,9 @@
 
 import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
-import { SendMessage } from "~/components/send-message";
+import { SendMessage } from "~/components/chats/send-message";
 import { Heart } from "lucide-react";
-import { ProfileDropdown } from "~/components/profile-dropdown";
+import { ProfileDropdown } from "~/components/chats/profile-dropdown";
 import { ChatMessage } from "../../_components/chat-message";
 
 export default async function Home() {

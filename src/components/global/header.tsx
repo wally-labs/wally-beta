@@ -2,8 +2,8 @@
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { ModelDropdown } from "./model-dropdown";
-import { SidebarTrigger } from "./ui/sidebar";
-import { Button } from "./ui/button";
+import { SidebarTrigger } from "../ui/sidebar";
+import { Button } from "../ui/button";
 
 export function Header({
   children,

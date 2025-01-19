@@ -5,7 +5,7 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { ClerkProvider } from "@clerk/nextjs";
-import MainSidebar from "~/components/nav-bar";
+import MainSidebar from "~/components/global/nav-bar";
 import { SidebarProvider } from "~/components/ui/sidebar";
 
 export const metadata: Metadata = {

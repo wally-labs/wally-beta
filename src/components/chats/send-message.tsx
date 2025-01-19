@@ -1,6 +1,6 @@
 // import { Button } from "@components/ui/button";
 import { CircleArrowRight } from "lucide-react";
-import ShineBorder from "./ui/shine-border";
+import ShineBorder from "../ui/shine-border";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuItem,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 
 interface Emotion {
   emotion: string;
