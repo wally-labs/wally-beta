@@ -1,21 +1,12 @@
 // import Link from "next/link";
 // import { LatestPost } from "~/app/_components/post";
 
-import { auth } from "~/server/auth";
-import { api } from "~/trpc/server";
 import { SendMessage } from "~/components/chats/send-message";
 import { Heart } from "lucide-react";
 import { ProfileDropdown } from "~/components/chats/profile-dropdown";
 import { ChatMessage } from "../../_components/chat-message";
 
 export default async function Home() {
-  // const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await auth();
-
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
-  }
-
   return (
     <>
       <div className="flex min-h-screen flex-col items-center bg-gradient-to-b from-[white] to-[#f7faff] text-black">

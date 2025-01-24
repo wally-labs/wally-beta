@@ -39,18 +39,16 @@ import {
   CommandItem,
   CommandList,
 } from "@components/ui/command";
-import { TRPCError } from "@trpc/server";
-import { getHTTPStatusCodeFromError } from "@trpc/server/unstable-core-do-not-import";
+import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   name: z.string().min(1),
   birthDate: z.string().date().optional(),
   // this should be a list of a few choices (enum)?
-  relationship: z.string().min(1),
+  relationship: z.string(),
   heartLevel: z
     .number()
     .int()
-    .min(1)
     .refine((value) => value >= 1 && value <= 5, {
       message: "Level must be between 1 and 5",
     }),
@@ -94,10 +92,6 @@ export default function CreateProfile() {
     },
     onError: (error) => {
       console.log("Failed to create profile: ", error);
-      if (error instanceof TRPCError) {
-        const httpCode = getHTTPStatusCodeFromError(error);
-        console.log(httpCode);
-      }
       // alert("Failed to create profile, please try again!");
     },
   });
@@ -105,6 +99,10 @@ export default function CreateProfile() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     createChatMutation.mutate({ chatHeader: values.name, ...values });
   }
+
+  const { isSignedIn, userId } = useAuth();
+  console.log("isSignedIn: ", isSignedIn);
+  console.log("userId: ", userId);
 
   return (
     <Form {...form}>

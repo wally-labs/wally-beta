@@ -33,3 +33,23 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 ## How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+
+## To-do list
+
+- [ ] error logging (w/ axiom - paid)
+- [ ] correct client side auth errors
+- [ ] customised user settings page
+- [ ] chat/profile configuration button and popup
+- [ ] build routes for all chat pages
+  - [ ] figure out best routing conventions
+  - [ ] chat headers route only called once during login, or after create-chat invocation
+  - [ ] delete chat functionality
+- [ ] load database with mock data for testing (one db for testing and one for production)
+- [ ] add image upload capabilities
+- [ ] connect to openAI API
+- [ ] test calls to openAI and routes (w/ tRPC)
+- [ ] error management (w/ sentry)
+- [ ] routing pages (parallel routes)
+- [ ] set up analytics (w/ posthog maybe highlight?)
+- [ ] payment processing (w/ stripe)
+- [ ] performace optimization testing (w/ react-scan)

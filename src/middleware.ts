@@ -1,13 +1,26 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
-const isPublicRoute = createRouteMatcher("/(.*)");
+const isProtectedRoute = createRouteMatcher(["/api/trpc/chat.createChat(.*)"]);
 
-export default clerkMiddleware(async (auth, request) => {
-  if (!isPublicRoute(request)) {
-    await auth.protect();
-  }
-});
+export default clerkMiddleware(
+  async (auth, request) => {
+    console.log("Req URL: ", request.url);
+    console.log("isProtectedRoute(): ", isProtectedRoute(request));
+    if (isProtectedRoute(request)) {
+      await auth.protect();
+      // console.log(
+      //   "Session User: ",
+      //   session.userId,
+      //   ", Session ID: ",
+      //   session.sessionId,
+      // );
+    }
+    // else {
+    //   console.log("NOT protected route");
+    // }
+  },
+  { debug: false },
+);
 
 export const config = {
   matcher: [

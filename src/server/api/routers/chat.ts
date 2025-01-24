@@ -1,15 +1,15 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const chatRouter = createTRPCRouter({
-  createChat: protectedProcedure
+  createChat: publicProcedure
     .input(
       z.object({
         chatHeader: z.string(),
         name: z.string(),
         birthDate: z.string().date().optional(),
-        relationship: z.string().date(),
+        relationship: z.string(),
         heartLevel: z.number().int(),
         race: z.string().optional(),
         country: z.string().optional(),
@@ -17,6 +17,20 @@ export const chatRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.session?.user?.id) {
+        console.log("this is the curr session: ", ctx.session?.user);
+      }
+
+      const userId = ctx.session?.user.id ?? "";
+
+      const user = await ctx.db.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new Error("Invalid userId: User does not exist.");
+      }
+
       const {
         chatHeader,
         name,
@@ -30,10 +44,10 @@ export const chatRouter = createTRPCRouter({
 
       const newChat = await ctx.db.chat.create({
         data: {
-          userId: ctx.session.user.id,
+          userId,
           chatHeader,
           name,
-          birthDate,
+          birthDate: birthDate ? new Date(birthDate) : null,
           relationship,
           heartLevel,
           race,
@@ -42,7 +56,7 @@ export const chatRouter = createTRPCRouter({
         },
       });
 
-      return newChat;
+      return newChat || null;
     }),
 
   updateChat: protectedProcedure
@@ -103,4 +117,9 @@ export const chatRouter = createTRPCRouter({
 
       return messages ?? [];
     }),
+
+  // incomplete sendMessage route
+  sendMessage: protectedProcedure.mutation(async ({ ctx, input }) => {
+    return;
+  }),
 });

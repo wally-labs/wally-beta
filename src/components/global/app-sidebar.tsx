@@ -31,7 +31,7 @@ import { api } from "~/trpc/react";
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const { data } = api.user.getAllChatHeaders.useQuery(undefined, {
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
 
   return (
