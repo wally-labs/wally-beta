@@ -17,16 +17,15 @@ export const chatRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.session?.user?.id) {
-        console.log("this is the curr session: ", ctx.session?.user);
+      if (!ctx.session?.user) {
+        throw new Error("User not authenticated");
       }
 
-      const userId = ctx.session?.user.id ?? "";
+      const userId = ctx.session?.user.id;
 
       const user = await ctx.db.user.findUnique({
         where: { id: userId },
       });
-
       if (!user) {
         throw new Error("Invalid userId: User does not exist.");
       }

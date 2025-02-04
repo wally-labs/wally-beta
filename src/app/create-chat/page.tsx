@@ -1,14 +1,14 @@
 // import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import CreateProfile from "~/components/profile/create-profile";
-import { auth } from "~/server/auth";
 
 export default async function CreateChat() {
-  const session = await auth();
+  const user = await currentUser();
 
-  if (session?.user) {
-    console.log("User is signed in! ", session?.user.id);
+  if (user) {
+    console.log("User is signed in! ", user);
   } else {
-    console.log("User is NOT signed in!", session);
+    console.log("User is NOT signed in!", user);
   }
 
   return (

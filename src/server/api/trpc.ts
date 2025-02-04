@@ -27,7 +27,9 @@ import { db } from "~/server/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+  console.log("Headers: ", opts.headers); // Debug
   const session = await auth();
+  console.log("Context: ", session); // Debug
 
   return {
     db,
@@ -122,6 +124,7 @@ export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
     if (!ctx.session || !ctx.session.user) {
+      console.log("Session data: ", ctx.session); // Debug
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({
