@@ -105,7 +105,9 @@ export default function CreateProfile() {
   console.log("userId: ", userId);
 
   return (
+    <div className="mt-16 max-w-3xl mx-auto p-4">
     <Form {...form}>
+      
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {/* Name field */}
         <FormField
@@ -320,5 +322,6 @@ export default function CreateProfile() {
         <Button type="submit">Create Profile</Button>
       </form>
     </Form>
+    </div>
   );
 }
