@@ -11,7 +11,8 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { auth } from "~/server/auth";
+// import { auth } from "~/server/auth";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "~/server/db";
 
 /**
@@ -123,14 +124,15 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (!ctx.session || !ctx.session.user) {
-      console.log("Session data: ", ctx.session); // Debug
+    // change both cases of `ctx.session.user` to `ctx.session.userId` when changing to Clerk
+    if (!ctx.session || !ctx.session.userId) {
+      console.log("Session data in trpc.ts: ", ctx.session); // Debug
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({
       ctx: {
         // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.user },
+        session: { ...ctx.session, user: ctx.session.userId },
       },
     });
   });

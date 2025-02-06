@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const chatRouter = createTRPCRouter({
   createChat: publicProcedure
@@ -17,11 +21,11 @@ export const chatRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.session?.user) {
+      if (!ctx.session?.userId) {
         throw new Error("User not authenticated");
       }
 
-      const userId = ctx.session?.user.id;
+      const userId = ctx.session?.userId;
 
       const user = await ctx.db.user.findUnique({
         where: { id: userId },
