@@ -1,6 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import type { WebhookEvent } from "@clerk/nextjs/server";
+import { api } from "~/trpc/server";
 
 export async function POST(req: Request) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET;
@@ -51,12 +52,20 @@ export async function POST(req: Request) {
   // Do something with payload
   // For this guide, log payload to console
   const { id } = evt.data;
+  if (!id) {
+    throw new Error("Error: Missing user ID in webhook event data");
+  }
   const eventType = evt.type;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const { first_name, last_name, email, emailVerified, image } = payload.data;
+  const name = `${first_name} ${last_name}`;
   console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
   console.log("Webhook payload:", body);
 
   if (evt.type === "user.created") {
     console.log("userId created:", evt.data.id);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    await api.user.createUser({ id, name, email, emailVerified, image });
   }
 
   if (evt.type === "user.updated") {

@@ -100,7 +100,7 @@ export default function CreateProfile() {
     createChatMutation.mutate({ chatHeader: values.name, ...values });
   }
 
-  const { isSignedIn, userId, isLoaded } = useAuth();
+  const { isSignedIn, userId } = useAuth();
   console.log("isSignedIn: ", isSignedIn, "userId: ", userId);
 
   return (

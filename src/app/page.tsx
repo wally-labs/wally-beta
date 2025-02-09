@@ -7,7 +7,7 @@ export default async function Home() {
   const session = await auth();
 
   if (session?.userId) {
-    console.log("User is signed in! home page: ", session.userId);
+    console.log("User is signed in! Home page: ", session.userId);
     void api.post.getLatest.prefetch();
   }
 
