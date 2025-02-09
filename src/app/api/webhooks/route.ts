@@ -65,7 +65,14 @@ export async function POST(req: Request) {
   if (evt.type === "user.created") {
     console.log("userId created:", evt.data.id);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    await api.user.createUser({ id, name, email, emailVerified, image });
+    const user = await api.user.createUser({
+      id,
+      name,
+      email,
+      emailVerified,
+      image,
+    });
+    console.log("User created:", user);
   }
 
   if (evt.type === "user.updated") {

@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
@@ -32,13 +33,25 @@ export const userRouter = createTRPCRouter({
   deleteUser: publicProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.delete({
-        where: {
-          id: input.id,
-        },
-      });
+      try {
+        await ctx.db.account.deleteMany({ where: { userId: input.id } });
+        await ctx.db.session.deleteMany({ where: { userId: input.id } });
+        await ctx.db.chat.deleteMany({ where: { userId: input.id } });
 
-      return user;
+        const user = await ctx.db.user.delete({
+          where: {
+            id: input.id,
+          },
+        });
+
+        return user;
+      } catch (error) {
+        console.error("User not found, Error deleting: ", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "User not found, Failed to delete",
+        });
+      }
     }),
 
   getAllChatHeaders: publicProcedure.query(async ({ ctx }) => {
