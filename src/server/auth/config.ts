@@ -45,9 +45,9 @@ export const authConfig = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-  pages: {
-    signIn: "/login", // Use a custom route for sign-in
-  },
+  // pages: {
+  //   signIn: "/login", // Use a custom route for sign-in
+  // },
   adapter: PrismaAdapter(db),
   callbacks: {
     session: ({ session, user }) => ({

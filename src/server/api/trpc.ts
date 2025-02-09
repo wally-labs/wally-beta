@@ -28,9 +28,9 @@ import { db } from "~/server/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  console.log("Headers: ", opts.headers); // Debug
+  // console.log("Headers: ", opts.headers); // Debug
   const session = await auth();
-  console.log("Context: ", session); // Debug
+  // console.log("Context: ", session); // Debug
 
   return {
     db,
@@ -126,7 +126,7 @@ export const protectedProcedure = t.procedure
   .use(({ ctx, next }) => {
     // change both cases of `ctx.session.user` to `ctx.session.userId` when changing to Clerk
     if (!ctx.session || !ctx.session.userId) {
-      console.log("Session data in trpc.ts: ", ctx.session); // Debug
+      // console.log("Session data in trpc.ts: ", ctx.session); // Debug
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
     return next({

@@ -100,228 +100,243 @@ export default function CreateProfile() {
     createChatMutation.mutate({ chatHeader: values.name, ...values });
   }
 
-  const { isSignedIn, userId } = useAuth();
-  console.log("isSignedIn: ", isSignedIn);
-  console.log("userId: ", userId);
+  const { isSignedIn, userId, isLoaded } = useAuth();
+  console.log("isSignedIn: ", isSignedIn, "userId: ", userId);
 
   return (
-    <div className="mt-16 max-w-3xl mx-auto p-4">
-    <Form {...form}>
-      
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {/* Name field */}
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Name" {...field} />
-              </FormControl>
-              <FormDescription>Your partner&apos;s name</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Birth Date field */}
-        <FormField
-          control={form.control}
-          name="birthDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Birth Date</FormLabel>
-              <FormControl>
-                <Input
-                  type="date"
-                  placeholder="your partner's birth date"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>Your partner&apos;s birth date</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Relationship Field */}
-        <FormField
-          control={form.control}
-          name="relationship"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Relationship</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+    <div className="mx-auto mt-16 max-w-3xl p-4">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Name field */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a relationship type" />
-                  </SelectTrigger>
+                  <Input placeholder="Name" {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="family">Family</SelectItem>
-                  <SelectItem value="friendship">Friendship</SelectItem>
-                  <SelectItem value="married">Married</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>Your partner&apos;s birth date</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription>Your partner&apos;s name</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Heart Level Field  */}
-        <FormField
-          control={form.control}
-          name="heartLevel"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Heart Level</FormLabel>
-              <Select onValueChange={(value) => field.onChange(Number(value))}>
+          {/* Birth Date field */}
+          <FormField
+            control={form.control}
+            name="birthDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Birth Date</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a heart level" />
-                  </SelectTrigger>
+                  <Input
+                    type="date"
+                    placeholder="your partner's birth date"
+                    {...field}
+                  />
                 </FormControl>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <SelectItem key={i} value={i.toString()}>
-                      {i}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>Your partner&apos;s heart level</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription>
+                  Your partner&apos;s birth date
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Race Field */}
-        <FormField
-          control={form.control}
-          name="race"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Race</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a race" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="chinese">Chinese</SelectItem>
-                  <SelectItem value="malay">Malay</SelectItem>
-                  <SelectItem value="indian">Indian</SelectItem>
-                  <SelectItem value="eurasian">Eurasian</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>Your partner&apos;s race</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Country Field */}
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Country</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a country" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="singapore">Singapore</SelectItem>
-                  <SelectItem value="malaysia">Malaysia</SelectItem>
-                  <SelectItem value="china">China</SelectItem>
-                  <SelectItem value="india">India</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>Your partner&apos;s race</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Language Field - small issue combobox is different color :(( */}
-        <FormField
-          control={form.control}
-          name="language"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Language</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
+          {/* Relationship Field */}
+          <FormField
+            control={form.control}
+            name="relationship"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Relationship</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
-                    <Button
-                      variant="secondary"
-                      role="combobox"
-                      className={cn(
-                        "justify-between",
-                        !field.value && "text-muted-foreground",
-                      )}
-                    >
-                      {field.value
-                        ? languages.find(
-                            (language) => language.value === field.value,
-                          )?.label
-                        : "Select language"}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a relationship type" />
+                    </SelectTrigger>
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput
-                      placeholder="Search language..."
-                      className="h-9"
-                    />
-                    <CommandList>
-                      <CommandEmpty>Language not available.</CommandEmpty>
-                      <CommandGroup>
-                        {languages.map((language) => (
-                          <CommandItem
-                            value={language.label}
-                            key={language.value}
-                            onSelect={() => {
-                              form.setValue("language", language.value);
-                            }}
-                          >
-                            {language.label}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                language.value === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0",
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormDescription>
-                Your partner&apos;s native language
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  <SelectContent>
+                    <SelectItem value="family">Family</SelectItem>
+                    <SelectItem value="friendship">Friendship</SelectItem>
+                    <SelectItem value="married">Married</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Your partner&apos;s birth date
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button type="submit">Create Profile</Button>
-      </form>
-    </Form>
+          {/* Heart Level Field  */}
+          <FormField
+            control={form.control}
+            name="heartLevel"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Heart Level</FormLabel>
+                <Select
+                  onValueChange={(value) => field.onChange(Number(value))}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a heart level" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <SelectItem key={i} value={i.toString()}>
+                        {i}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Your partner&apos;s heart level
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Race Field */}
+          <FormField
+            control={form.control}
+            name="race"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Race</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a race" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="chinese">Chinese</SelectItem>
+                    <SelectItem value="malay">Malay</SelectItem>
+                    <SelectItem value="indian">Indian</SelectItem>
+                    <SelectItem value="eurasian">Eurasian</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>Your partner&apos;s race</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Country Field */}
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a country" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="singapore">Singapore</SelectItem>
+                    <SelectItem value="malaysia">Malaysia</SelectItem>
+                    <SelectItem value="china">China</SelectItem>
+                    <SelectItem value="india">India</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>Your partner&apos;s race</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Language Field - small issue combobox is different color :(( */}
+          <FormField
+            control={form.control}
+            name="language"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Language</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="secondary"
+                        role="combobox"
+                        className={cn(
+                          "justify-between",
+                          !field.value && "text-muted-foreground",
+                        )}
+                      >
+                        {field.value
+                          ? languages.find(
+                              (language) => language.value === field.value,
+                            )?.label
+                          : "Select language"}
+                        <ChevronsUpDown className="opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput
+                        placeholder="Search language..."
+                        className="h-9"
+                      />
+                      <CommandList>
+                        <CommandEmpty>Language not available.</CommandEmpty>
+                        <CommandGroup>
+                          {languages.map((language) => (
+                            <CommandItem
+                              value={language.label}
+                              key={language.value}
+                              onSelect={() => {
+                                form.setValue("language", language.value);
+                              }}
+                            >
+                              {language.label}
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  language.value === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormDescription>
+                  Your partner&apos;s native language
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type="submit">Create Profile</Button>
+        </form>
+      </Form>
     </div>
   );
 }
