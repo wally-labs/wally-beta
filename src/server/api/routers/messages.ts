@@ -63,6 +63,7 @@ export const messagesRouter = createTRPCRouter({
             },
             content: {
               contains: keyword,
+              mode: "insensitive",
             },
           },
           orderBy: {
