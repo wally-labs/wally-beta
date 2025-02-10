@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
@@ -7,6 +8,7 @@ import {
 } from "~/server/api/trpc";
 
 export const chatRouter = createTRPCRouter({
+  // creates a chat for the user and configures the profile for the current chat and pushes new chat to the db
   createChat: publicProcedure
     .input(
       z.object({
@@ -59,9 +61,10 @@ export const chatRouter = createTRPCRouter({
         },
       });
 
-      return newChat || null;
+      return newChat;
     }),
 
+  // update the current chat's profile details and pushes changes to the db
   updateChat: protectedProcedure
     .input(
       z.object({
@@ -93,36 +96,47 @@ export const chatRouter = createTRPCRouter({
       return updatedChat;
     }),
 
-  getChatMessages: protectedProcedure
-    .input(
-      z.object({
-        chatId: z.string(),
-        before: z.string().optional(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const { chatId, before } = input;
-      const messages = await ctx.db.messages.findMany({
-        where: {
-          chatId,
-          createdAt: before ? { lt: new Date(before) } : undefined,
-        },
-        orderBy: {
-          createdAt: "asc",
-        },
-        select: {
-          id: true,
-          content: true,
-          messageBy: true,
-          createdAt: true,
-        },
-      });
+  // delete the current chat and all messages associated with it
+  deleteChat: protectedProcedure
+    .input(z.object({ chatId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const chat = await ctx.db.chat.delete({
+          where: { id: input.chatId },
+        });
 
-      return messages ?? [];
+        return chat;
+      } catch (Error) {
+        console.log("Failed to delete chat: ", Error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete chat",
+        });
+      }
     }),
 
-  // incomplete sendMessage route
-  sendMessage: protectedProcedure.mutation(async ({ ctx, input }) => {
-    return;
+  // get all chat headers for the user, to display on the home page (should only be called ONCE upon login or refresh)
+  getAllChatHeaders: publicProcedure.query(async ({ ctx }) => {
+    const isLoggedIn = !!ctx.session.userId;
+
+    if (!isLoggedIn) {
+      return [];
+    }
+
+    const headers = await ctx.db.chat.findMany({
+      where: {
+        userId: ctx.session.userId!,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        chatHeader: true,
+        updatedAt: true,
+      },
+    });
+
+    return headers;
   }),
 });
