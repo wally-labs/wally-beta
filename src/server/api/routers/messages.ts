@@ -43,7 +43,7 @@ export const messagesRouter = createTRPCRouter({
 
   // search for a message in all chats
   searchKeyWord: protectedProcedure
-    .input(z.object({ keyword: z.string(), id: z.string() }))
+    .input(z.object({ keyword: z.string().optional(), id: z.string() }))
     .query(async ({ ctx, input }) => {
       // try to see whether ctx.session.id works or nah, if it does no need to keep passing in user
       const { keyword, id } = input;

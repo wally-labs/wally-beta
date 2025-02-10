@@ -81,6 +81,7 @@ model Chat {
 
     // profile fields
     name         String
+    gender       String
     birthDate    DateTime? @default(now())
     relationship String
     heartLevel   Int       @default(1) 

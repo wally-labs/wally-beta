@@ -43,6 +43,7 @@ import { useAuth } from "@clerk/nextjs";
 
 const formSchema = z.object({
   name: z.string().min(1),
+  gender: z.string(),
   birthDate: z.string().date().optional(),
   // this should be a list of a few choices (enum)?
   relationship: z.string(),
@@ -76,6 +77,7 @@ export default function CreateProfile() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      gender: "",
       birthDate: "",
       relationship: "",
       heartLevel: 1,
@@ -118,6 +120,33 @@ export default function CreateProfile() {
                   <Input placeholder="Name" {...field} />
                 </FormControl>
                 <FormDescription>Your partner&apos;s name</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Gender field */}
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a gender" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="non-binary">Non-binary</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>Your partner&apos;s gender</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
