@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import type { WebhookEvent } from "@clerk/nextjs/server";
@@ -56,21 +59,46 @@ export async function POST(req: Request) {
     throw new Error("Error: Missing user ID in webhook event data");
   }
   const eventType = evt.type;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const { first_name, last_name, email, emailVerified, image } = payload.data;
-  const name = `${first_name} ${last_name}`;
-  console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
-  console.log("Webhook payload:", body);
 
   if (evt.type === "user.created") {
+    const {
+      first_name,
+      last_name,
+      email_addresses,
+      primary_email_address_id,
+      emailVerified,
+      image_url,
+    } = payload.data;
+    const email =
+      email_addresses?.find((email) => email.id === primary_email_address_id)
+        ?.email_address || null;
+    const name = `${first_name} ${last_name}`;
+    console.log(
+      `Received webhook with ID ${id} and event type of ${eventType}`,
+    );
+    console.log("Webhook payload:", body);
+
+    // fix email verified!!!
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const emailVerifiedDate = new Date().toISOString();
+    console.log(
+      "webhook data: ",
+      id,
+      name,
+      email,
+      emailVerified,
+      emailVerifiedDate,
+      image_url,
+    );
+
     console.log("userId created:", evt.data.id);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const user = await api.user.createUser({
       id,
       name,
       email,
-      emailVerified,
-      image,
+      emailVerified: emailVerifiedDate,
+      image: image_url,
     });
     console.log("User created:", user);
   }
@@ -81,6 +109,8 @@ export async function POST(req: Request) {
 
   if (evt.type === "user.deleted") {
     console.log("userId deleted:", evt.data.id);
+
+    const user = await api.user.deleteUser({ id: id });
   }
 
   return new Response("Webhook received", { status: 200 });
