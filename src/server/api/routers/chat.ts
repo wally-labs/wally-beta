@@ -14,6 +14,7 @@ export const chatRouter = createTRPCRouter({
       z.object({
         chatHeader: z.string(),
         name: z.string(),
+        gender: z.string(),
         birthDate: z.string().date().optional(),
         relationship: z.string(),
         heartLevel: z.number().int(),
@@ -39,6 +40,7 @@ export const chatRouter = createTRPCRouter({
       const {
         chatHeader,
         name,
+        gender,
         birthDate,
         relationship,
         heartLevel,
@@ -52,6 +54,7 @@ export const chatRouter = createTRPCRouter({
           userId,
           chatHeader,
           name,
+          gender,
           birthDate: birthDate ? new Date(birthDate) : null,
           relationship,
           heartLevel,
@@ -71,6 +74,7 @@ export const chatRouter = createTRPCRouter({
         chatId: z.string(),
         chatHeader: z.string().optional(),
         name: z.string().optional(),
+        gender: z.string().optional(),
         birthDate: z.string().optional(),
         relationship: z.string().optional(),
         heartLevel: z.number().int().optional(),

@@ -30,9 +30,13 @@ import { api } from "~/trpc/react";
 // ];
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
-  const { data } = api.user.getAllChatHeaders.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
+  const { data, isLoading, isSuccess } = api.chat.getAllChatHeaders.useQuery(
+    undefined,
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    },
+  );
 
   return (
     <Sidebar collapsible="icon">
@@ -61,16 +65,19 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
               <span className="sr-only">Start a New Chat!</span>
             </SidebarGroupAction>
             <SidebarMenu>
-              {data?.map((chat) => (
-                <SidebarMenuItem key={chat.id}>
-                  <SidebarMenuButton asChild>
-                    <a href={chat.id}>
-                      <CircleUserRound />
-                      <span>{chat.chatHeader}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {isLoading && <SidebarMenuItem>Loading...</SidebarMenuItem>}
+              {isSuccess &&
+                data.length > 0 &&
+                data.map((chat) => (
+                  <SidebarMenuItem key={chat.id}>
+                    <SidebarMenuButton asChild>
+                      <a href={chat.id}>
+                        <CircleUserRound />
+                        <span>{chat.chatHeader}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <a href="create-chat">
