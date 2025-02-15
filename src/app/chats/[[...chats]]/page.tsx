@@ -1,12 +1,24 @@
-// import Link from "next/link";
-// import { LatestPost } from "~/app/_components/post";
+"use client";
 
 import { SendMessage } from "~/components/chats/send-message";
 import { Heart } from "lucide-react";
 import { ProfileDropdown } from "~/components/chats/profile-dropdown";
 import { ChatMessage } from "../../_components/chat-message";
+import { useParams } from "next/navigation";
+import { api } from "~/trpc/react";
+import { skipToken } from "@tanstack/react-query";
 
-export default async function Home() {
+export default function ChatHome() {
+  const { chats } = useParams();
+  const chatHeader = Array.isArray(chats) ? chats[0] : chats;
+  const { data, isLoading, isSuccess } = api.messages.getChatMessages.useQuery(
+    chatHeader ? { chatId: chatHeader } : skipToken,
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    },
+  );
+
   return (
     <div className="flex min-h-screen flex-col items-center bg-gradient-to-b from-[white] to-[#f7faff] text-black">
       <div className="flex h-[10%] w-[70%] items-center justify-between space-x-2">

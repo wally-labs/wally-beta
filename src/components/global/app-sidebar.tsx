@@ -8,18 +8,27 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSkeleton,
 } from "@components/ui/sidebar";
 
 import {
   CircleUserRound,
   HomeIcon,
   MessageCircle,
+  MoreHorizontal,
   Plus,
   Settings,
 } from "lucide-react";
 import { api } from "~/trpc/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@components/ui/dropdown-menu";
 
 // const chats = [
 //   {
@@ -65,7 +74,11 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
               <span className="sr-only">Start a New Chat!</span>
             </SidebarGroupAction>
             <SidebarMenu>
-              {isLoading && <SidebarMenuItem>Loading...</SidebarMenuItem>}
+              {isLoading && (
+                <SidebarMenuItem>
+                  <SidebarMenuSkeleton showIcon />
+                </SidebarMenuItem>
+              )}
               {isSuccess &&
                 data.length > 0 &&
                 data.map((chat) => (
@@ -76,6 +89,21 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                         <span>{chat.chatHeader}</span>
                       </a>
                     </SidebarMenuButton>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuAction>
+                          <MoreHorizontal />
+                        </SidebarMenuAction>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent side="right" align="start">
+                        <DropdownMenuItem>
+                          <span>Edit Profile</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <span>Delete Profile</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </SidebarMenuItem>
                 ))}
               <SidebarMenuItem>

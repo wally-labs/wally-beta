@@ -29,7 +29,7 @@ export const userRouter = createTRPCRouter({
       return user;
     }),
 
-  // update any data associated with the user in db
+  // update any data associated with the user in db (not completed yet!)
   // updateUser: publicProcedure.input(z.object({}))
 
   // delete user data and all data associated with the user from db

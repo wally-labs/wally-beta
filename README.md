@@ -36,22 +36,56 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 ## To-do list
 
-- [ ] error logging (w/ axiom - paid)
-- [x] correct client side auth errors
-- [ ] customised user settings page (optional)
-- [ ] chat/profile configuration button and popup
-- [ ] build routes for all chat pages
-  - [x] figure out best routing conventions
-  - [ ] chat headers route only called once during login, or after create-chat invocation
+### DEMO
+
+- [ ] front-end
+
+  - [x] create home/chat/login pages
+  - [x] stylized home page (can be improved)
+
+- [x] correct client side auth errors (import session from clerk not next-auth)
+
+- [ ] auth + trpc
+
+  - [ ] fix login page ui (just styling)
+  - [x] remove user id input from all routes (await auth())
+  - [ ] update clerk webhooks to send data to vercel db
+  - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
+
+- [ ] profile
+
+  - [ ] customised user settings page (optional)
+  - [ ] chat/profile configuration button and popup
+  - [ ] create updateProfile route, only updates necessary info
   - [ ] delete chat functionality
-- [x] load database with mock data for testing (one db for testing and one for production)
-- [ ] add image upload capabilities
-- [ ] connect to openAI API
+
+- [ ] homepage + chat headers
+
+  - [ ] test chatHeaders routes
+  - [x] figure out best routing conventions
+  - [x] chat headers route only called once during login, or after create-chat invocation (not for demo)
+  - [ ] create chat scrollbox
+
+- [ ] openAI API (text-to-text)
+
+  - [x] system prompt optimization (can be improved)
+  - [x] write sendMessage route
   - [ ] test sendMessage call to openAI and check response
-  - [ ] add context window library and tokenizer
+  - [ ] route only required data from db to server, add context window library and tokenizer, figure out embedding
   - [ ] optimize speed and payload size
+
+### PRODUCTION
+
+- [ ] performace optimization testing (w/ react-scan) (not for demo)
+
+  - [ ] optimize front-end data fetching with react-query
+  - [ ] minimize rerenders
+
+- [ ] separate dbs for production and dev (w/ vercel - paid, not for demo)
+- [ ] check auth caching state (not for demo?)
+- [ ] add image upload capabilities (not for demo)
+- [ ] error logging (w/ axiom - paid) (not for demo)
 - [ ] error management (w/ sentry)
 - [ ] routing pages (parallel routes)
 - [ ] set up analytics (w/ posthog maybe highlight?)
-- [ ] payment processing (w/ stripe)
-- [ ] performace optimization testing (w/ react-scan)
+- [ ] payment processing + webhooks (w/ stripe)

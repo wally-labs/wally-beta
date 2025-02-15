@@ -127,6 +127,9 @@ export const chatRouter = createTRPCRouter({
       return [];
     }
 
+    // for debugging purposes we are only returning null
+    return [];
+
     const headers = await ctx.db.chat.findMany({
       where: {
         userId: ctx.session.userId!,
