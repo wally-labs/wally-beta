@@ -11,7 +11,7 @@ export const userRouter = createTRPCRouter({
         id: z.string(),
         name: z.string(),
         email: z.string(),
-        emailVerified: z.string().datetime().optional(),
+        emailVerified: z.date().optional(),
         image: z.string().url().optional(),
       }),
     )

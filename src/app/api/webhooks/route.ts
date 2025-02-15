@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -68,7 +69,6 @@ export async function POST(req: Request) {
       last_name,
       email_addresses,
       primary_email_address_id,
-      emailVerified,
       image_url,
     } = payload.data;
     const email =
@@ -79,16 +79,10 @@ export async function POST(req: Request) {
     const name = `${first_name} ${last_name}`;
 
     // fix email verified!!!
-    const emailVerifiedDate = new Date().toISOString();
-    console.log(
-      "webhook data: ",
-      id,
-      name,
-      email,
-      emailVerified,
-      emailVerifiedDate,
-      image_url,
-    );
+    const emailVerifiedDate =
+      email.verification.status === "verified"
+        ? new Date(email.updated_at)
+        : undefined;
 
     console.log("userId created:", evt.data.id);
     const user = await api.user.createUser({

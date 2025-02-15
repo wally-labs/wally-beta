@@ -49,7 +49,8 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
   - [ ] fix login page ui (just styling)
   - [x] remove user id input from all routes (await auth())
-  - [ ] update clerk webhooks to send data to vercel db
+  - [x] seed current users into vercel db
+  - [ ] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
 
 - [ ] profile

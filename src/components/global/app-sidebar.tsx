@@ -84,7 +84,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                 data.map((chat) => (
                   <SidebarMenuItem key={chat.id}>
                     <SidebarMenuButton asChild>
-                      <a href={chat.id}>
+                      <a href={"chats/" + chat.id}>
                         <CircleUserRound />
                         <span>{chat.chatHeader}</span>
                       </a>

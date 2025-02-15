@@ -44,3 +44,9 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# clerk users test
+clerk_users.json
+clerk_transformed_users.json
+clerk_transform.js
+clerk_seed.js
