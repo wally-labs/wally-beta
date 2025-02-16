@@ -1,11 +1,60 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+// /* eslint-disable @typescript-eslint/no-unsafe-argument */
+// /* eslint-disable @typescript-eslint/no-unsafe-call */
+// /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+// /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import type { WebhookEvent } from "@clerk/nextjs/server";
 import { api } from "~/trpc/server";
+
+interface EmailVerification {
+  status: string;
+  strategy: string;
+}
+
+interface EmailAddress {
+  email_address: string;
+  id: string;
+  linked_to: [];
+  object: string;
+  verification: EmailVerification;
+  created_at: number;
+  updated_at: number;
+}
+
+interface ClerkWebhookPayload {
+  data: {
+    birthday: string;
+    created_at: number;
+    email_addresses: EmailAddress[];
+    external_accounts: [];
+    external_id: string;
+    first_name: string;
+    gender: string;
+    id: string;
+    image_url: string;
+    last_name: string;
+    last_sign_in_at: number;
+    object: string;
+    password_enabled: boolean;
+    phone_numbers: [];
+    primary_email_address_id: string | null;
+    primary_phone_number_id: string | null;
+    primary_web3_wallet_id: string | null;
+    private_metadata: Record<string, unknown>;
+    profile_image_url: string;
+    public_metadata: Record<string, unknown>;
+    two_factor_enabled: boolean;
+    unsafe_metadata: Record<string, unknown>;
+    updated_at: number;
+    username: string | null;
+    web3_wallets: [];
+  };
+  instance_id: string;
+  object: string;
+  timestamp: number;
+  type: "user.created" | "user.updated" | "user.deleted";
+}
 
 export async function POST(req: Request) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET;
@@ -34,7 +83,7 @@ export async function POST(req: Request) {
 
   // Get body
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const payload = await req.json();
+  const payload: ClerkWebhookPayload = await req.json();
   const body = JSON.stringify(payload);
 
   let evt: WebhookEvent;
@@ -71,23 +120,24 @@ export async function POST(req: Request) {
       primary_email_address_id,
       image_url,
     } = payload.data;
-    const email =
-      email_addresses?.find(
-        (email: { id: string; email_address: string }) =>
-          email.id === primary_email_address_id,
-      )?.email_address || null;
+
+    const emailObj = email_addresses.find(
+      (email) => email.id === primary_email_address_id,
+    );
     const name = `${first_name} ${last_name}`;
 
     let emailVerifiedDate: Date | undefined = undefined;
-    if (email && email.verification.status === "verified") {
-      emailVerifiedDate = new Date(email.updated_at);
+    let email = undefined;
+    if (emailObj && emailObj.verification.status === "verified") {
+      emailVerifiedDate = new Date(emailObj.updated_at);
+      email = emailObj.email_address;
     }
 
     console.log("userId created:", evt.data.id);
     const user = await api.user.createUser({
       id,
       name,
-      email,
+      email: email ?? "",
       emailVerified: emailVerifiedDate,
       image: image_url,
     });
