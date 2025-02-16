@@ -42,7 +42,6 @@ export const aiRouter = createTRPCRouter({
   sendMessage: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
         emotion: z.string(),
         message: z.string(),
       }),
@@ -50,7 +49,7 @@ export const aiRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       try {
         const profile = await ctx.db.chat.findUnique({
-          where: { id: input.id },
+          where: { id: ctx.session.userId },
         });
 
         const gender =

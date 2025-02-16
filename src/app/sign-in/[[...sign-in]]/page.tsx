@@ -1,10 +1,8 @@
 import { SignIn } from "@clerk/nextjs";
-// import LogInPage from "../../_components/login";
 
 export default function CustomSignIn() {
-  // return <LogInPage />;
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <SignIn
         appearance={{
           elements: {

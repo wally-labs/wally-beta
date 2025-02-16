@@ -41,15 +41,19 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 - [ ] front-end
 
   - [x] create home/chat/login pages
-  - [x] stylized home page (can be improved)
+  - [x] personify home page (can be improved) - more relatable ui
+  - [ ] personify sidebar ui + classify by relationship maybe(?) (can be improved)
+  - [x] fix chat page ui
+  - [x] update sidebar ui, completely hidden
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
 
 - [ ] auth + trpc
 
-  - [ ] fix login page ui (just styling)
-  - [x] remove user id input from all routes (await auth())
+  - [x] fix login page ui (just styling)
+  - [x] remove user id input from all routes use id from ctx.session
   - [x] seed current users into vercel db
+  - [ ] user with no plan is rerouted to "/plans" page when navigating to 'new chat'
   - [ ] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
 
@@ -62,9 +66,10 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 - [ ] homepage + chat headers
 
-  - [ ] test chatHeaders routes
+  - [x] test chatHeaders routes
   - [x] figure out best routing conventions
-  - [x] chat headers route only called once during login, or after create-chat invocation (not for demo)
+  - [ ] route createChat to new page with the chat once complete
+  - [ ] chat headers route only called once during login, or after create-chat invocation (not for demo)
   - [ ] create chat scrollbox
 
 - [ ] openAI API (text-to-text)
@@ -80,6 +85,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 - [ ] performace optimization testing (w/ react-scan) (not for demo)
 
   - [ ] optimize front-end data fetching with react-query
+  - [ ] learn all different types of queries
   - [ ] minimize rerenders
 
 - [ ] separate dbs for production and dev (w/ vercel - paid, not for demo)

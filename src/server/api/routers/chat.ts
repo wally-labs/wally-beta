@@ -9,7 +9,7 @@ import {
 
 export const chatRouter = createTRPCRouter({
   // creates a chat for the user and configures the profile for the current chat and pushes new chat to the db
-  createChat: publicProcedure
+  createChat: protectedProcedure
     .input(
       z.object({
         chatHeader: z.string(),
@@ -24,12 +24,7 @@ export const chatRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.session?.userId) {
-        throw new Error("User not authenticated");
-      }
-
-      const userId = ctx.session?.userId;
-
+      const userId = ctx.session.userId;
       const user = await ctx.db.user.findUnique({
         where: { id: userId },
       });
@@ -120,16 +115,10 @@ export const chatRouter = createTRPCRouter({
     }),
 
   // get all chat headers for the user, to display on the home page (should only be called ONCE upon login or refresh)
-  getAllChatHeaders: publicProcedure.query(async ({ ctx }) => {
-    const isLoggedIn = !!ctx.session.userId;
-
-    if (!isLoggedIn) {
-      return [];
-    }
-
+  getAllChatHeaders: protectedProcedure.query(async ({ ctx }) => {
     const headers = await ctx.db.chat.findMany({
       where: {
-        userId: ctx.session.userId!,
+        userId: ctx.session.userId,
       },
       orderBy: {
         createdAt: "desc",

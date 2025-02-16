@@ -82,7 +82,7 @@ model Chat {
     // profile fields
     name         String
     gender       String
-    birthDate    DateTime? @default(now())
+    birthDate    DateTime?
     relationship String
     heartLevel   Int       @default(1) 
     race         String? 

@@ -15,14 +15,13 @@ import {
 } from "@components/ui/sidebar";
 
 import {
+  CircleFadingArrowUp,
   CircleUserRound,
   HomeIcon,
   MessageCircle,
   MoreHorizontal,
   Plus,
-  Settings,
 } from "lucide-react";
-import { api } from "~/trpc/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,13 +29,8 @@ import {
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
 
-// const chats = [
-//   {
-//     title: "Samantha",
-//     url: "/chats/user-one",
-//     icon: CircleUserRound,
-//   },
-// ];
+import { api } from "~/trpc/react";
+import Link from "next/link";
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const { data, isLoading, isSuccess } = api.chat.getAllChatHeaders.useQuery(
@@ -48,7 +42,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar>
       <div className="top-0 flex w-full items-center justify-between p-3">
         {children}
       </div>
@@ -58,10 +52,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href={"/"}>
+                <Link href={"/"}>
                   <HomeIcon />
                   <span>Home</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -84,10 +78,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                 data.map((chat) => (
                   <SidebarMenuItem key={chat.id}>
                     <SidebarMenuButton asChild>
-                      <a href={"chats/" + chat.id}>
+                      <Link href={`/chats/${chat.id}`}>
                         <CircleUserRound />
                         <span>{chat.chatHeader}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -108,10 +102,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                 ))}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="create-chat">
+                  <Link href={"/create-chat"}>
                     <Plus />
                     <span>New Chat</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -122,10 +116,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
         <SidebarMenu>
           <SidebarMenuItem key={"user-profile"} className="mx-auto">
             <SidebarMenuButton asChild>
-              <a href="#">
-                <Settings />
-                <span>Configure Profile</span>
-              </a>
+              <Link href="#">
+                <CircleFadingArrowUp />
+                <span>Upgrade plan</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

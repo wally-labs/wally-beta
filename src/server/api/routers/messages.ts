@@ -5,6 +5,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const messagesRouter = createTRPCRouter({
   // get messages from db ONCE when chat page opens up, get according to time and fill later
+  // not very sure how to do this tho...
   getChatMessages: protectedProcedure
     .input(
       z.object({
@@ -43,16 +44,14 @@ export const messagesRouter = createTRPCRouter({
 
   // search for a message in all chats
   searchKeyWord: protectedProcedure
-    .input(z.object({ keyword: z.string().optional(), id: z.string() }))
+    .input(z.object({ keyword: z.string().optional() }))
     .query(async ({ ctx, input }) => {
-      // try to see whether ctx.session.id works or nah, if it does no need to keep passing in user
-      const { keyword, id } = input;
+      const { keyword } = input;
 
       try {
         const chatIds = await ctx.db.chat.findMany({
           where: {
             userId: ctx.session.userId,
-            // userId: id
           },
         });
 

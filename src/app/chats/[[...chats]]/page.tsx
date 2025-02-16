@@ -1,9 +1,9 @@
 "use client";
 
-import { SendMessage } from "~/components/chats/send-message";
+import { SendMessage } from "~/app/_components/chat/send-message";
 import { Heart } from "lucide-react";
-import { ProfileDropdown } from "~/components/chats/profile-dropdown";
-import { ChatMessage } from "../../_components/chat-message";
+import { ProfileDropdown } from "~/app/_components/chat/profile-dropdown";
+import { ChatMessage } from "../../_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { skipToken } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ export default function ChatHome() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gradient-to-b from-[white] to-[#f7faff] text-black">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-20 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
       <div className="flex h-[10%] w-[70%] items-center justify-between space-x-2">
         <div className="flex">
           <Heart className="text-red-500" />

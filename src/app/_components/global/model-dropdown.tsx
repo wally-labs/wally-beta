@@ -4,8 +4,8 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@components/ui/dropdown-menu";
-import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { Gem } from "lucide-react";
 
 export function ModelDropdown() {
