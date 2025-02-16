@@ -1,5 +1,4 @@
 import { SendMessage } from "~/app/_components/chat/send-message";
-// import { auth } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
 
 export default async function Home() {

@@ -28,7 +28,6 @@
     "paths": {
       "~/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
-      "@_components/*": ["./src/_components/*"],
       "@utils/*": ["./src/lib/utils/*"],
       "@ui/*": ["./src/components/ui/*"],
       "@lib/*": ["./src/lib/*"],

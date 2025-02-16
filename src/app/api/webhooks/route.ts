@@ -78,11 +78,10 @@ export async function POST(req: Request) {
       )?.email_address || null;
     const name = `${first_name} ${last_name}`;
 
-    // fix email verified!!!
-    const emailVerifiedDate =
-      email.verification.status === "verified"
-        ? new Date(email.updated_at)
-        : undefined;
+    let emailVerifiedDate: Date | undefined = undefined;
+    if (email && email.verification.status === "verified") {
+      emailVerifiedDate = new Date(email.updated_at);
+    }
 
     console.log("userId created:", evt.data.id);
     const user = await api.user.createUser({

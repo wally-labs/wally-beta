@@ -42,9 +42,10 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
   - [x] create home/chat/login pages
   - [x] personify home page (can be improved) - more relatable ui
-  - [ ] personify sidebar ui + classify by relationship maybe(?) (can be improved)
   - [x] fix chat page ui
   - [x] update sidebar ui, completely hidden
+  - [ ] personify sidebar ui + classify by relationship maybe(?) (can be improved)
+  - [ ] fix create-chat page ui (languages greyed out)
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
 
@@ -79,6 +80,12 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [ ] test sendMessage call to openAI and check response
   - [ ] route only required data from db to server, add context window library and tokenizer, figure out embedding
   - [ ] optimize speed and payload size
+
+- [ ] clean up all code and add comments for ease of reading
+  - [ ] /app
+    - [ ] /\_components
+    - [ ] all other pages
+  - [ ] /server
 
 ### PRODUCTION
 
