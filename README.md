@@ -77,15 +77,15 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
   - [x] system prompt optimization (can be improved)
   - [x] write sendMessage route
-  - [ ] test sendMessage call to openAI and check response
+  - [x] test sendMessage call to openAI and check response
   - [ ] route only required data from db to server, add context window library and tokenizer, figure out embedding
   - [ ] optimize speed and payload size
 
-- [ ] clean up all code and add comments for ease of reading
-  - [ ] /app
-    - [ ] /\_components
-    - [ ] all other pages
-  - [ ] /server
+- [x] clean up all code and add comments for ease of reading
+  - [x] /app
+    - [x] /\_components
+    - [x] all other pages
+  - [x] /server
 
 ### PRODUCTION
 

@@ -102,8 +102,7 @@ export async function POST(req: Request) {
     });
   }
 
-  // Do something with payload
-  // For this guide, log payload to console
+  // Send user data to vercel db
   const { id } = evt.data;
   if (!id) {
     throw new Error("Error: Missing user ID in webhook event data");
@@ -141,17 +140,19 @@ export async function POST(req: Request) {
       emailVerified: emailVerifiedDate,
       image: image_url,
     });
-    console.log("User created:", user);
+
+    console.log("userId created:", user.id);
   }
 
+  // fix this up later!!
   if (evt.type === "user.updated") {
     console.log("userId updated:", evt.data.id);
   }
 
+  // Delete user from vercel db
   if (evt.type === "user.deleted") {
-    console.log("userId deleted:", evt.data.id);
-
     await api.user.deleteUser({ id });
+    console.log("userId deleted:", evt.data.id);
   }
 
   return new Response("Webhook received", { status: 200 });

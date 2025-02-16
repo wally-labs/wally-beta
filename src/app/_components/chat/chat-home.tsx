@@ -11,16 +11,34 @@ import { skipToken } from "@tanstack/react-query";
 export default function ChatHome() {
   const { chats } = useParams();
   const chatHeader = Array.isArray(chats) ? chats[0] : chats;
-  const { data, isLoading, isSuccess } = api.messages.getChatMessages.useQuery(
+  const {
+    data: dataMessages,
+    isLoading: isLoadingMessages,
+    isSuccess: isSuccessMessages,
+  } = api.messages.getChatMessages.useQuery(
     chatHeader ? { chatId: chatHeader } : skipToken,
     {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
+      enabled: !!chatHeader,
+    },
+  );
+
+  const {
+    data: dataChat,
+    isLoading: isLoadingChat,
+    isSuccess: isLoadingSuccess,
+  } = api.chat.getChat.useQuery(
+    chatHeader ? { chatId: chatHeader } : skipToken,
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      enabled: !!chatHeader,
     },
   );
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-20 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
       <div className="flex h-[10%] w-[70%] items-center justify-between space-x-2">
         <div className="flex">
           <Heart className="text-red-500" />
@@ -51,6 +69,6 @@ export default function ChatHome() {
       <div className="mx-auto w-[70%] p-4">
         <SendMessage />
       </div>
-    </>
+    </div>
   );
 }

@@ -114,6 +114,19 @@ export const chatRouter = createTRPCRouter({
       }
     }),
 
+  // get all chat details for the user, to display on the chat page
+  getChat: protectedProcedure
+    .input(z.object({ chatId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const chat = await ctx.db.chat.findUnique({
+        where: {
+          id: input.chatId,
+        },
+      });
+
+      return chat;
+    }),
+
   // get all chat headers for the user, to display on the home page (should only be called ONCE upon login or refresh)
   getAllChatHeaders: protectedProcedure.query(async ({ ctx }) => {
     const headers = await ctx.db.chat.findMany({
