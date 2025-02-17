@@ -30,9 +30,12 @@ import {
 } from "@components/ui/dropdown-menu";
 
 import { api } from "~/trpc/react";
+import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
+  const state = useAuth();
+
   const { data, isLoading, isSuccess } = api.chat.getAllChatHeaders.useQuery(
     undefined,
     {
@@ -46,7 +49,6 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
       <div className="top-0 flex w-full items-center justify-between p-3">
         {children}
       </div>
-      <SidebarHeader className="p-0"></SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
@@ -69,7 +71,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
             </SidebarGroupAction>
             <SidebarMenu>
               {isLoading && (
-                <SidebarMenuItem>
+                <SidebarMenuItem key={"loading"}>
                   <SidebarMenuSkeleton showIcon />
                 </SidebarMenuItem>
               )}
@@ -102,7 +104,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                 ))}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href={"/create-chat"}>
+                  <Link href={state.isSignedIn ? "/create-chat" : "/plans"}>
                     <Plus />
                     <span>New Chat</span>
                   </Link>

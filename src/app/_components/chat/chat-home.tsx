@@ -10,20 +10,21 @@ import { skipToken } from "@tanstack/react-query";
 import { ScrollArea } from "~/components/ui/scroll-area";
 
 export default function ChatHome() {
+  // object has the same name as the slug in the URL
   const { chats } = useParams();
   const chatHeader = Array.isArray(chats) ? chats[0] : chats;
-  const {
-    data: dataMessages,
-    isLoading: isLoadingMessages,
-    isSuccess: isSuccessMessages,
-  } = api.messages.getChatMessages.useQuery(
-    chatHeader ? { chatId: chatHeader } : skipToken,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      enabled: !!chatHeader,
-    },
-  );
+  //   const {
+  //     data: dataMessages,
+  //     isLoading: isLoadingMessages,
+  //     isSuccess: isSuccessMessages,
+  //   } = api.messages.getChatMessages.useQuery(
+  //     chatHeader ? { chatId: chatHeader } : skipToken,
+  //     {
+  //       refetchOnWindowFocus: false,
+  //       refetchOnMount: false,
+  //       enabled: !!chatHeader,
+  //     },
+  //   );
 
   const {
     data: dataChat,
@@ -42,7 +43,6 @@ export default function ChatHome() {
   const relationship = dataChat?.relationship;
   const name = dataChat?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
-  console.log(redHeartLevel, grayHeartLevel);
 
   return (
     // DIVIDE into components once ui is decided -> components take in heart level as input and return ui accordingly

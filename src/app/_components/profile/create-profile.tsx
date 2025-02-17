@@ -40,6 +40,7 @@ import {
   CommandList,
 } from "@components/ui/command";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -87,14 +88,14 @@ export default function CreateProfile() {
     },
   });
 
+  const router = useRouter();
   const createChatMutation = api.chat.createChat.useMutation({
     onSuccess: (data) => {
       console.log("Profile created successfully: ", data);
-      // alert("Profile created successfully!");
+      router.push(`/chats/${data.id}`);
     },
     onError: (error) => {
       console.log("Failed to create profile: ", error);
-      // alert("Failed to create profile, please try again!");
     },
   });
 

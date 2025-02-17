@@ -45,7 +45,8 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] fix chat page ui
   - [x] update sidebar ui, completely hidden
   - [x] personify sidebar ui + classify by relationship maybe(?) (CAN be improved)
-  - [ ] create plans page
+  - [x] create plans page
+  - [ ] create popup ui to be used throughout site for errors/successes etc..
   - [ ] fix create-chat page ui (languages greyed out)
   - [ ] map each message from openai req to chatmessage component, and improve scrollbox
 
@@ -56,14 +57,15 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] fix login page ui (just styling)
   - [x] remove user id input from all routes use id from ctx.session
   - [x] seed current users into vercel db
-  - [ ] user with no plan is rerouted to "/plans" page when navigating to 'new chat'
-  - [ ] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
+  - [x] user with no plan is rerouted to "/plans" page when navigating to 'new chat'
+  - [x] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
 
 - [x] profile
 
   - [x] customised user settings page (optional)
   - [x] chat/profile configuration button and popup
+  - [x] route to new chat page when profile is created
   - [ ] create updateProfile route, only updates necessary info
   - [ ] delete chat functionality
 
