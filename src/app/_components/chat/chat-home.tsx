@@ -29,7 +29,7 @@ export default function ChatHome() {
   const {
     data: dataChat,
     isLoading: isLoadingChat,
-    isSuccess: isLoadingSuccess,
+    isSuccess: isSuccessChat,
   } = api.chat.getChat.useQuery(
     chatHeader ? { chatId: chatHeader } : skipToken,
     {
@@ -49,12 +49,18 @@ export default function ChatHome() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
       <div className="flex h-[10%] w-[70%] items-center justify-between space-x-2">
         <div className="flex">
-          {Array.from({ length: redHeartLevel! }).map((_, i) => (
-            <Heart key={i} className="text-red-500" />
-          ))}
-          {Array.from({ length: grayHeartLevel }).map((_, i) => (
-            <Heart key={i} className="text-gray-500" />
-          ))}
+          {isLoadingChat &&
+            Array.from({ length: 5 }).map((_, i) => (
+              <Heart key={i} className="text-gray-500" />
+            ))}
+          {isSuccessChat &&
+            Array.from({ length: redHeartLevel! }).map((_, i) => (
+              <Heart key={i} className="text-red-500" />
+            ))}
+          {isSuccessChat &&
+            Array.from({ length: grayHeartLevel }).map((_, i) => (
+              <Heart key={i} className="text-gray-500" />
+            ))}
         </div>
         <div>
           <h2 className="text-3xl font-bold text-red-600">{name} 🌹</h2>

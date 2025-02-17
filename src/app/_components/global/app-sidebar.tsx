@@ -44,6 +44,19 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     },
   );
 
+  const deleteChatMutation = api.chat.deleteChat.useMutation({
+    onSuccess: (data) => {
+      console.log("Chat deleted successfully", data);
+    },
+    onError: (error) => {
+      console.error("Failed to delete chat: ", error);
+    },
+  });
+
+  function deleteChat(chatId: string) {
+    deleteChatMutation.mutate({ chatId });
+  }
+
   return (
     <Sidebar>
       <div className="top-0 flex w-full items-center justify-between p-3">
@@ -96,7 +109,9 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                           <span>Edit Profile</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <span>Delete Profile</span>
+                          <span onClick={() => deleteChat(chat.id)}>
+                            Delete Profile
+                          </span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

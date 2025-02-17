@@ -48,7 +48,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] create plans page
   - [ ] create popup ui to be used throughout site for errors/successes etc..
   - [ ] fix create-chat page ui (languages greyed out)
-  - [ ] map each message from openai req to chatmessage component, and improve scrollbox
+  - [ ] map each message from openai/user message to a chatmessage component, and improve scrollbox
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
 
@@ -67,7 +67,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] chat/profile configuration button and popup
   - [x] route to new chat page when profile is created
   - [ ] create updateProfile route, only updates necessary info
-  - [ ] delete chat functionality
+  - [ ] delete chat functionality + add to frontend
 
 - [ ] homepage + chat headers
 
@@ -81,7 +81,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
   - [x] system prompt optimization (can be improved)
   - [x] write sendMessage route
-  - [x] test sendMessage call to openAI and check response
+  - [ ] test sendMessage call to openAI and check response
   - [ ] route only required data from db to server, add context window library and tokenizer, figure out embedding
   - [ ] optimize speed and payload size
 

@@ -1,11 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const chatRouter = createTRPCRouter({
   // creates a chat for the user and configures the profile for the current chat and pushes new chat to the db
@@ -25,13 +21,6 @@ export const chatRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.userId;
-      const user = await ctx.db.user.findUnique({
-        where: { id: userId },
-      });
-      if (!user) {
-        throw new Error("Invalid userId: User does not exist.");
-      }
-
       const {
         chatHeader,
         name,
