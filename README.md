@@ -44,7 +44,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] personify home page (can be improved) - more relatable ui
   - [x] fix chat page ui
   - [x] update sidebar ui, completely hidden
-  - [ ] personify sidebar ui + classify by relationship maybe(?) (can be improved)
+  - [x] personify sidebar ui + classify by relationship maybe(?) (CAN be improved)
   - [ ] fix create-chat page ui (languages greyed out)
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
@@ -58,10 +58,10 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [ ] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
 
-- [ ] profile
+- [x] profile
 
-  - [ ] customised user settings page (optional)
-  - [ ] chat/profile configuration button and popup
+  - [x] customised user settings page (optional)
+  - [x] chat/profile configuration button and popup
   - [ ] create updateProfile route, only updates necessary info
   - [ ] delete chat functionality
 
@@ -69,7 +69,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
   - [x] test chatHeaders routes
   - [x] figure out best routing conventions
-  - [ ] route createChat to new page with the chat once complete
+  - [x] route createChat to new page with the chat once complete
   - [ ] chat headers route only called once during login, or after create-chat invocation (not for demo)
   - [ ] create chat scrollbox
 
