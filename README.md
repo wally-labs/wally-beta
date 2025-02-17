@@ -45,7 +45,9 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] fix chat page ui
   - [x] update sidebar ui, completely hidden
   - [x] personify sidebar ui + classify by relationship maybe(?) (CAN be improved)
+  - [ ] create plans page
   - [ ] fix create-chat page ui (languages greyed out)
+  - [ ] map each message from openai req to chatmessage component, and improve scrollbox
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
 
@@ -71,7 +73,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] figure out best routing conventions
   - [x] route createChat to new page with the chat once complete
   - [ ] chat headers route only called once during login, or after create-chat invocation (not for demo)
-  - [ ] create chat scrollbox
+  - [x] create chat scrollbox
 
 - [ ] openAI API (text-to-text)
 

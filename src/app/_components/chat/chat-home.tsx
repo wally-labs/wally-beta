@@ -67,6 +67,7 @@ export default function ChatHome() {
         </div>
       </div>
       <ScrollArea className="mx-auto flex h-[500px] w-[70%] flex-col space-y-2 overflow-y-auto rounded-md border pb-2">
+        {/* map each message in messages[] to a <ChatMessage> component */}
         <ChatMessage message="Hello there!" isUser={true} />
         <ChatMessage message="Hey there! How’s it going? Working on anything interesting today?" />
         <ChatMessage

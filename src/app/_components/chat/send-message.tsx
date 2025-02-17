@@ -69,7 +69,7 @@ export function SendMessage() {
             id="newMessage"
             className="w-full resize-none border-none bg-inherit p-4 focus:outline-none sm:text-sm"
             rows={1}
-            placeholder="Send a Message to TextMate"
+            placeholder="Send a Message to Wally"
           ></textarea>
           <div className="flex items-center gap-2 p-4">
             {/* <Button variant="secondary">Clear</Button> */}
