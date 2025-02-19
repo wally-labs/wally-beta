@@ -42,7 +42,7 @@ import {
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
-const formSchema = z.object({
+export const formSchema = z.object({
   name: z.string().min(1),
   gender: z.string(),
   birthDate: z.string().date().optional(),
@@ -60,7 +60,7 @@ const formSchema = z.object({
   language: z.string(),
 });
 
-const languages = [
+export const languages = [
   { label: "English", value: "en" },
   { label: "French", value: "fr" },
   { label: "German", value: "de" },

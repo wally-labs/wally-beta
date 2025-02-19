@@ -47,6 +47,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] personify sidebar ui + classify by relationship maybe(?) (CAN be improved)
   - [x] create plans page
   - [ ] create popup ui to be used throughout site for errors/successes etc..
+  - [ ] create update profile dialog box component
   - [ ] fix create-chat page ui (languages greyed out)
   - [ ] map each message from openai/user message to a chatmessage component, and improve scrollbox
 
@@ -66,8 +67,8 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] customised user settings page (optional)
   - [x] chat/profile configuration button and popup
   - [x] route to new chat page when profile is created
-  - [ ] create updateProfile route, only updates necessary info
-  - [ ] delete chat functionality + add to frontend
+  - [x] create updateProfile route, only updates necessary info
+  - [x] delete chat functionality + add to frontend
 
 - [ ] homepage + chat headers
 
@@ -82,7 +83,8 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] system prompt optimization (can be improved)
   - [x] write sendMessage route
   - [ ] test sendMessage call to openAI and check response
-  - [ ] route only required data from db to server, add context window library and tokenizer, figure out embedding
+  - [ ] stream ai responses
+  - [ ] add context window library and tokenizer, figure out embedding
   - [ ] optimize speed and payload size
 
 - [x] clean up all code and add comments for ease of reading
@@ -98,6 +100,8 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [ ] optimize front-end data fetching with react-query
   - [ ] learn all different types of queries
   - [ ] minimize rerenders
+  - [ ] integrate react context api, if necessary..
+  - [ ] try out abort controller
 
 - [ ] separate dbs for production and dev (w/ vercel - paid, not for demo)
 - [ ] check auth caching state (not for demo?)

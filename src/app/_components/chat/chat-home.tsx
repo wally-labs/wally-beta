@@ -8,41 +8,57 @@ import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { skipToken } from "@tanstack/react-query";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { useChat } from "@ai-sdk/react";
+import { useEffect, useRef, useState } from "react";
 
 export default function ChatHome() {
   // object has the same name as the slug in the URL
   const { chats } = useParams();
-  const chatHeader = Array.isArray(chats) ? chats[0] : chats;
-  //   const {
-  //     data: dataMessages,
-  //     isLoading: isLoadingMessages,
-  //     isSuccess: isSuccessMessages,
-  //   } = api.messages.getChatMessages.useQuery(
-  //     chatHeader ? { chatId: chatHeader } : skipToken,
-  //     {
-  //       refetchOnWindowFocus: false,
-  //       refetchOnMount: false,
-  //       enabled: !!chatHeader,
-  //     },
-  //   );
+  const chatId = Array.isArray(chats) ? chats[0] : chats;
 
   const {
     data: dataChat,
     isLoading: isLoadingChat,
     isSuccess: isSuccessChat,
-  } = api.chat.getChat.useQuery(
-    chatHeader ? { chatId: chatHeader } : skipToken,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      enabled: !!chatHeader,
-    },
-  );
+  } = api.chat.getChat.useQuery(chatId ? { chatId: chatId } : skipToken, {
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    enabled: !!chatId,
+  });
 
   const redHeartLevel = dataChat?.heartLevel;
   const relationship = dataChat?.relationship;
   const name = dataChat?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
+
+  const [selectedEmotion, setSelectedEmotion] = useState("");
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: "/api/chat",
+    experimental_prepareRequestBody: ({ messages }) => ({
+      messages,
+      emotion: selectedEmotion,
+    }),
+    onFinish: () => {
+      console.log("Chat finished, messages:", messages);
+      setSelectedEmotion("");
+    },
+  });
+
+  const handleEmotionSubmit = (emotion: string) => {
+    setSelectedEmotion(emotion);
+  };
+
+  const handleFinalSubmit = () => {
+    handleSubmit();
+  };
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     // DIVIDE into components once ui is decided -> components take in heart level as input and return ui accordingly
@@ -72,21 +88,36 @@ export default function ChatHome() {
           <ProfileDropdown />
         </div>
       </div>
-      <ScrollArea className="mx-auto flex h-[500px] w-[70%] flex-col space-y-2 overflow-y-auto rounded-md border pb-2">
+      <ScrollArea
+        ref={scrollRef}
+        className="mx-auto flex h-[500px] w-[70%] min-w-[70%] flex-col space-y-2 overflow-y-auto rounded-md border pb-2"
+      >
         {/* map each message in messages[] to a <ChatMessage> component */}
         <ChatMessage message="Hello there!" isUser={true} />
         <ChatMessage message="Hey there! How’s it going? Working on anything interesting today?" />
-        <ChatMessage
+        {messages.map((message, index) => (
+          <ChatMessage
+            key={index}
+            message={message.content}
+            isUser={message.role === "user"}
+          />
+        ))}
+        {/* <ChatMessage
           message="I am doing pretty good! I need your help TextMate, I am currently talking to the love of my life and I think she's mad what do I say?"
           isUser={true}
         />
         <ChatMessage message="Sure, I’d be happy to help! Go ahead and send the screenshot, and I’ll do my best to guide you through it." />
         <ChatMessage message="blah blah blah" isUser={true} />
         <ChatMessage message="Sure, I’d be happy to help! Go ahead and send the screenshot, and I’ll do my best to guide you through it." />
-        <ChatMessage message="blah blah blah" isUser={true} />
+        <ChatMessage message="blah blah blah" isUser={true} /> */}
       </ScrollArea>
-      <div className="mx-auto w-[70%] p-4">
-        <SendMessage />
+      <div className="mx-auto w-[70%] min-w-[70%] p-4">
+        <SendMessage
+          onSubmit={handleFinalSubmit}
+          input={input}
+          handleInputChange={handleInputChange}
+          onEmotionSubmit={handleEmotionSubmit}
+        />
       </div>
     </div>
   );

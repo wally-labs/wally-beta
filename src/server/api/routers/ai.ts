@@ -39,14 +39,14 @@ const pronouns: Record<string, Pronouns> = {
 export const aiRouter = createTRPCRouter({
   // incomplete sendMessage to openAI API route
   // send message to openAI and wait for response
-  sendMessage: protectedProcedure
+  streamChat: protectedProcedure
     .input(
       z.object({
         emotion: z.string(),
         message: z.string(),
       }),
     )
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       try {
         const profile = await ctx.db.chat.findUnique({
           where: { id: ctx.session.userId },
