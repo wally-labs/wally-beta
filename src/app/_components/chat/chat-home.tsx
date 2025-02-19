@@ -138,12 +138,6 @@ export default function ChatHome() {
         <ChatMessage message="blah blah blah" isUser={true} /> */}
       </ScrollArea>
       <div className="mx-auto w-[70%] min-w-[70%] p-4">
-        {/* <SendMessage
-          onSubmit={handleFinalSubmit}
-          input={input}
-          handleInputChange={handleInputChange}
-          onEmotionSubmit={handleEmotionSubmit}
-        /> */}
         <label htmlFor="newMessage" className="sr-only">
           Send a Message
         </label>

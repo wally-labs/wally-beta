@@ -1,3 +1,5 @@
+"use client";
+
 // NOT IN USE CURRENTLY
 
 import { CircleArrowRight } from "lucide-react";
@@ -16,19 +18,7 @@ interface Emotion {
   emoji: string;
 }
 
-interface SendMessageProps {
-  input: string;
-  handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSubmit: () => void;
-  onEmotionSubmit: (emotion: string) => void;
-}
-
-export function SendMessage({
-  input,
-  handleInputChange,
-  onSubmit,
-  onEmotionSubmit,
-}: SendMessageProps) {
+export function SendMessage() {
   const emotions: Emotion[] = [
     { emotion: "happy", emoji: "😊" },
     { emotion: "sad", emoji: "😔" },
@@ -51,8 +41,6 @@ export function SendMessage({
             className="w-full resize-none border-none bg-inherit p-4 focus:outline-none sm:text-sm"
             rows={1}
             placeholder="Send a Message to Wally"
-            value={input}
-            onChange={handleInputChange}
           ></textarea>
           <div className="flex items-center gap-2 p-4">
             <DropdownMenu>
@@ -67,8 +55,7 @@ export function SendMessage({
                     <DropdownMenuItem
                       key={e.emotion}
                       onClick={() => {
-                        onEmotionSubmit(e.emotion);
-                        onSubmit();
+                        console.log(e.emotion);
                       }}
                     >
                       {e.emotion}
