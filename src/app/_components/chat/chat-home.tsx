@@ -1,7 +1,6 @@
 "use client";
 
-import { Heart } from "lucide-react";
-import { SendMessage } from "~/app/_components/chat/send-message";
+import { Heart, CircleArrowRight } from "lucide-react";
 import { ProfileDropdown } from "~/app/_components/chat/profile-dropdown";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
@@ -10,8 +9,29 @@ import { skipToken } from "@tanstack/react-query";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState } from "react";
+import ShineBorder from "@components/ui/shine-border";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from "@components/ui/dropdown-menu";
+
+interface Emotion {
+  emotion: string;
+  emoji: string;
+}
 
 export default function ChatHome() {
+  const emotions: Emotion[] = [
+    { emotion: "happy", emoji: "😊" },
+    { emotion: "sad", emoji: "😔" },
+    { emotion: "angry", emoji: "😡" },
+    { emotion: "romantic", emoji: "🌹" },
+  ];
+
   // object has the same name as the slug in the URL
   const { chats } = useParams();
   const chatId = Array.isArray(chats) ? chats[0] : chats;
@@ -31,34 +51,40 @@ export default function ChatHome() {
   const name = dataChat?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
 
+  // handle openai api call
   const [selectedEmotion, setSelectedEmotion] = useState("");
+  const [shouldSubmit, setShouldSubmit] = useState(false);
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     api: "/api/chat",
     experimental_prepareRequestBody: ({ messages }) => ({
       messages,
       emotion: selectedEmotion,
     }),
-    onFinish: () => {
-      console.log("Chat finished, messages:", messages);
-      setSelectedEmotion("");
-    },
   });
 
   const handleEmotionSubmit = (emotion: string) => {
     setSelectedEmotion(emotion);
+    setShouldSubmit(true);
   };
 
-  const handleFinalSubmit = () => {
-    handleSubmit();
-  };
+  useEffect(() => {
+    if (shouldSubmit) {
+      handleSubmit();
+      setShouldSubmit(false);
+    }
+  }, [shouldSubmit, handleSubmit]);
 
+  // handle stick-to-bottom scroll area
   const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomMessageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollIntoView({
+        behavior: "smooth",
+      });
     }
-  }, [messages]);
+  }, [bottomMessageRef]);
 
   return (
     // DIVIDE into components once ui is decided -> components take in heart level as input and return ui accordingly
@@ -112,12 +138,54 @@ export default function ChatHome() {
         <ChatMessage message="blah blah blah" isUser={true} /> */}
       </ScrollArea>
       <div className="mx-auto w-[70%] min-w-[70%] p-4">
-        <SendMessage
+        {/* <SendMessage
           onSubmit={handleFinalSubmit}
           input={input}
           handleInputChange={handleInputChange}
           onEmotionSubmit={handleEmotionSubmit}
-        />
+        /> */}
+        <label htmlFor="newMessage" className="sr-only">
+          Send a Message
+        </label>
+        <div className="flex items-center overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+          <ShineBorder
+            className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border bg-background md:shadow-xl"
+            color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
+          >
+            <textarea
+              id="newMessage"
+              className="w-full resize-none border-none bg-inherit p-4 focus:outline-none sm:text-sm"
+              rows={1}
+              placeholder="Send a Message to Wally"
+              value={input}
+              onChange={handleInputChange}
+            ></textarea>
+            <div className="flex items-center gap-2 p-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <CircleArrowRight className="text-lg" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Emotions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {emotions.map((e) => {
+                    return (
+                      <DropdownMenuItem
+                        key={e.emotion}
+                        onClick={() => {
+                          handleEmotionSubmit(e.emotion);
+                        }}
+                      >
+                        {e.emotion}
+                        <span>{e.emoji}</span>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </ShineBorder>
+        </div>
       </div>
     </div>
   );

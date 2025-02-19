@@ -1,3 +1,5 @@
+// NOT IN USE CURRENTLY
+
 import { CircleArrowRight } from "lucide-react";
 import ShineBorder from "@components/ui/shine-border";
 import {
@@ -28,10 +30,10 @@ export function SendMessage({
   onEmotionSubmit,
 }: SendMessageProps) {
   const emotions: Emotion[] = [
-    { emotion: "Happy", emoji: "😊" },
-    { emotion: "Sad", emoji: "😔" },
-    { emotion: "Angry", emoji: "😡" },
-    { emotion: "Romantic", emoji: "🌹" },
+    { emotion: "happy", emoji: "😊" },
+    { emotion: "sad", emoji: "😔" },
+    { emotion: "angry", emoji: "😡" },
+    { emotion: "romantic", emoji: "🌹" },
   ];
 
   return (

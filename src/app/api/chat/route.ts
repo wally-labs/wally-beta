@@ -1,5 +1,5 @@
 import { openai } from "@ai-sdk/openai";
-import { type LanguageModelV1, streamText, UIMessage } from "ai";
+import { type LanguageModelV1, streamText, type UIMessage } from "ai";
 
 export async function POST(req: Request) {
   const model: LanguageModelV1 = openai("gpt-3.5-turbo");
