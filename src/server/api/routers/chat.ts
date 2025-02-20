@@ -59,7 +59,7 @@ export const chatRouter = createTRPCRouter({
         chatHeader: z.string().optional(),
         name: z.string().optional(),
         gender: z.string().optional(),
-        birthDate: z.string().optional(),
+        birthDate: z.string().date().optional(),
         relationship: z.string().optional(),
         heartLevel: z.number().int().optional(),
         race: z.string().optional(),
@@ -78,7 +78,10 @@ export const chatRouter = createTRPCRouter({
 
       const updatedChat = await ctx.db.chat.update({
         where: { id: chatId },
-        data,
+        data: {
+          ...data,
+          birthDate: data.birthDate ? new Date(data.birthDate) : null,
+        },
       });
 
       return updatedChat;

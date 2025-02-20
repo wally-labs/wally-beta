@@ -45,6 +45,7 @@ import { useRouter } from "next/navigation";
 export const formSchema = z.object({
   name: z.string().min(1),
   gender: z.string(),
+  // convert to data object(?)
   birthDate: z.string().date().optional(),
   // this should be a list of a few choices (enum)?
   relationship: z.string(),
@@ -198,7 +199,7 @@ export default function CreateProfile() {
                   </SelectContent>
                 </Select>
                 <FormDescription>
-                  Your partner&apos;s birth date
+                  Your partner&apos;s relationship with you
                 </FormDescription>
                 <FormMessage />
               </FormItem>

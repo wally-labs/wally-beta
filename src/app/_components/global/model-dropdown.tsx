@@ -11,7 +11,7 @@ import { Gem } from "lucide-react";
 export function ModelDropdown() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>TextMate 1.0</DropdownMenuTrigger>
+      <DropdownMenuTrigger>Wally 1.0</DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>Models</DropdownMenuLabel>
         <DropdownMenuSeparator />

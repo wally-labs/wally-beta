@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
 import { Settings } from "lucide-react";
+import UpdateProfile from "../profile/update-profile";
 
 export function ProfileDropdown() {
   return (
@@ -17,7 +18,9 @@ export function ProfileDropdown() {
       <DropdownMenuContent>
         <DropdownMenuLabel>Settings</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Edit Profile</DropdownMenuItem>
+        <DropdownMenuItem>
+          <UpdateProfile />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
