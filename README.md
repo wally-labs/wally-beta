@@ -115,3 +115,8 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 - [ ] routing pages (parallel routes)
 - [ ] set up analytics (w/ posthog maybe highlight?)
 - [ ] payment processing + webhooks (w/ stripe)
+
+### POST-PRODUCTION
+
+- [ ] migrate from pinecone db to milvus once we start to scale
+- [ ] migrate from vercel hosting to ...
