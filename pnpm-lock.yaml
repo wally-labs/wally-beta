@@ -38,6 +38,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.54.2(react@18.3.1))
+      '@pinecone-database/pinecone':
+        specifier: ^5.0.2
+        version: 5.0.2
       '@prisma/client':
         specifier: ^5.14.0
         version: 5.22.0(prisma@5.22.0)
@@ -599,6 +602,10 @@ packages:
 
   '@panva/hkdf@1.2.1':
     resolution: {integrity: sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw==}
+
+  '@pinecone-database/pinecone@5.0.2':
+    resolution: {integrity: sha512-4Nd6sA/Ds81hem59TWYKkAR/R9cOnYMGDZvkxpay5R2dalCN979353V5Y+zFw8I+Rmi6yi3MsVjg6ls0/EXwCw==}
+    engines: {node: '>=18.0.0'}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3552,6 +3559,8 @@ snapshots:
   '@opentelemetry/api@1.9.0': {}
 
   '@panva/hkdf@1.2.1': {}
+
+  '@pinecone-database/pinecone@5.0.2': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

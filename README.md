@@ -92,10 +92,13 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [ ] optimize speed and payload size
 
 - [x] clean up all code and add comments for ease of reading
+
   - [x] /app
     - [x] /\_components
     - [x] all other pages
   - [x] /server
+
+- [ ] add image upload capabilities (not for demo)
 
 ### PRODUCTION
 
@@ -109,12 +112,12 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 - [ ] separate dbs for production and dev (w/ vercel - paid, not for demo)
 - [ ] check auth caching state (not for demo?)
-- [ ] add image upload capabilities (not for demo)
 - [ ] error logging (w/ axiom - paid) (not for demo)
 - [ ] error management (w/ sentry)
 - [ ] routing pages (parallel routes)
 - [ ] set up analytics (w/ posthog maybe highlight?)
 - [ ] payment processing + webhooks (w/ stripe)
+- [ ] language option (expand wally ai to be able to give answers in different languages)
 
 ### POST-PRODUCTION
 

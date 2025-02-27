@@ -79,4 +79,35 @@ export const messagesRouter = createTRPCRouter({
         });
       }
     }),
+
+  // save a message to db
+  saveMessage: protectedProcedure
+    .input(
+      z.object({
+        chatId: z.string(),
+        content: z.string(),
+        messageBy: z.enum(["USER", "WALLY"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { chatId, content, messageBy } = input;
+
+      try {
+        const message = await ctx.db.messages.create({
+          data: {
+            chatId,
+            content,
+            messageBy,
+          },
+        });
+
+        return message;
+      } catch (error) {
+        console.error("Error saving message: ", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to save message",
+        });
+      }
+    }),
 });

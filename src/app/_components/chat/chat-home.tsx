@@ -60,6 +60,7 @@ export default function ChatHome() {
     experimental_prepareRequestBody: ({ messages }) => ({
       messages,
       emotion: selectedEmotion,
+      chatId: chatId,
     }),
   });
 

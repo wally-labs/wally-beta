@@ -101,6 +101,7 @@ model Messages {
     id        String   @id @default(cuid())
     chatId    String
     content   String
+    vectorKey String?   @unique // reference to pinecone db vector key
     messageBy Sender
 
     createdAt DateTime @default(now())
