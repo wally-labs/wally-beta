@@ -1,6 +1,6 @@
 import { openai } from "@ai-sdk/openai";
 import { type LanguageModelV1, streamText, type UIMessage } from "ai";
-import { api } from "~/trpc/server";
+// import { api } from "~/trpc/server";
 
 export async function POST(req: Request) {
   const model: LanguageModelV1 = openai("gpt-3.5-turbo");
@@ -8,23 +8,21 @@ export async function POST(req: Request) {
   const {
     messages,
     emotion,
-    chatId,
-  }: { messages: UIMessage[]; emotion: string | undefined; chatId: string } =
+  }: { messages: UIMessage[]; emotion: string | undefined } =
     (await req.json()) as {
       messages: UIMessage[];
       emotion: string | undefined;
-      chatId: string;
     };
 
-  if (messages.length > 0) {
-    const lastMesage = messages[messages.length - 1];
+  // if (messages.length > 0) {
+  //   const lastMesage = messages[messages.length - 1];
 
-    await api.messages.saveMessage({
-      chatId,
-      content: lastMesage!.content,
-      messageBy: "USER",
-    });
-  }
+  //   await api.messages.saveMessage({
+  //     chatId,
+  //     content: lastMesage!.content,
+  //     messageBy: "USER",
+  //   });
+  // }
 
   const prompt = `You are Wally and you will act as a helpful and professional relationship wellness assistant. 
   The user is currently feeling ${emotion}.`;
@@ -34,16 +32,40 @@ export async function POST(req: Request) {
     messages: [{ role: "system", content: prompt }, ...messages],
   });
 
-  let aiResponseText = "";
-  for await (const chunk of result.textStream) {
-    aiResponseText += chunk;
-  }
+  // (async () => {
+  //   let aiResponseText = "";
+  //   for await (const chunk of result.textStream) {
+  //     aiResponseText += chunk;
+  //   }
+  //   try {
+  //     await api.messages.saveMessage({
+  //       chatId,
+  //       content: aiResponseText,
+  //       messageBy: "WALLY",
+  //     });
+  //   } catch (err) {
+  //     console.error("Failed to save message from Wally", err);
+  //   }
+  // })().catch((err) => {
+  //   console.error("Error in async IIFE", err);
+  // });
 
-  await api.messages.saveMessage({
-    chatId,
-    content: aiResponseText,
-    messageBy: "WALLY",
+  return result.toDataStreamResponse({
+    getErrorMessage: (error) => {
+      if (error == null) {
+        return "unknown error";
+      }
+
+      if (typeof error === "string") {
+        return error;
+      }
+
+      if (error instanceof Error) {
+        return error.message;
+      }
+
+      return JSON.stringify(error);
+    },
+    sendUsage: false,
   });
-
-  return result.toDataStreamResponse();
 }

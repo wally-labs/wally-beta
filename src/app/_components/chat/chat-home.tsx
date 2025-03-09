@@ -1,13 +1,12 @@
 "use client";
 
 import { Heart, CircleArrowRight } from "lucide-react";
-// import { ProfileDropdown } from "~/app/_components/chat/profile-dropdown";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { skipToken } from "@tanstack/react-query";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { useChat } from "@ai-sdk/react";
+import { useChat, type Message } from "@ai-sdk/react";
 import { useEffect, useState } from "react";
 import ShineBorder from "@components/ui/shine-border";
 import {
@@ -37,6 +36,7 @@ export default function ChatHome() {
   const { chats } = useParams();
   const chatId = Array.isArray(chats) ? chats[0] : chats;
 
+  // handles getting profile data from the db and setting it in the UI
   const {
     data: dataChat,
     isLoading: isLoadingChat,
@@ -55,7 +55,16 @@ export default function ChatHome() {
   // handle openai api call
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [shouldSubmit, setShouldSubmit] = useState(false);
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
+
+  // useChat() hook sends a HTTP POST request to /api/chat endpoint
+  const {
+    messages,
+    setMessages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    status,
+  } = useChat({
     api: "/api/chat",
     experimental_prepareRequestBody: ({ messages }) => ({
       messages,
@@ -64,11 +73,35 @@ export default function ChatHome() {
     }),
   });
 
+  // handle getting all previous messages from the db
+  const { data: dataMessages } = api.messages.getChatMessages.useQuery(
+    chatId ? { chatId: chatId } : skipToken,
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      enabled: !!chatId,
+    },
+  );
+
+  // use setMessage to set queried messages into data to be sent to the openai api
+  useEffect(() => {
+    if (dataMessages) {
+      const queriedMessages: Message[] = dataMessages.map((message) => ({
+        id: message.id,
+        content: message.content,
+        role: message.messageBy === "USER" ? "user" : "system",
+      }));
+      setMessages(queriedMessages);
+    }
+  }, [dataMessages, setMessages]);
+
+  // handles selecting an emotion from the dropdown menu, once emotion is set in state, should submit the message
   const handleEmotionSubmit = (emotion: string) => {
     setSelectedEmotion(emotion);
     setShouldSubmit(true);
   };
 
+  // useEffect to handle submitting the message once shouldSubmit is set to true
   useEffect(() => {
     if (shouldSubmit) {
       handleSubmit();
@@ -101,14 +134,13 @@ export default function ChatHome() {
           </h3>
         </div>
         <div>
-          {/* <ProfileDropdown /> */}
           <UpdateProfile />
         </div>
       </div>
       <ScrollArea className="mx-auto flex h-[500px] w-[70%] min-w-[70%] flex-col space-y-2 overflow-y-auto rounded-md border pb-2">
-        {/* map each message in messages[] to a <ChatMessage> component */}
-        <ChatMessage message="Hello there!" isUser={true} />
-        <ChatMessage message="Hey there! How’s it going? Working on anything interesting today?" />
+        {/* placeholder because the UI is not fixed yet */}
+        <ChatMessage message="Hello! I'm Wally, your relationship wellness assistant. How can I help you today?" />
+        {/* map each message in messages[] to a <ChatMessage> Component */}
         {messages.map((message, index) => (
           <ChatMessage
             key={index}
@@ -116,14 +148,7 @@ export default function ChatHome() {
             isUser={message.role === "user"}
           />
         ))}
-        {/* <ChatMessage
-          message="I am doing pretty good! I need your help Wally, I am currently talking to the love of my life and I think she's mad what do I say?"
-          isUser={true}
-        />
-        <ChatMessage message="Sure, I’d be happy to help! Go ahead and send the screenshot, and I’ll do my best to guide you through it." />
-        <ChatMessage message="blah blah blah" isUser={true} />
-        <ChatMessage message="Sure, I’d be happy to help! Go ahead and send the screenshot, and I’ll do my best to guide you through it." />
-        <ChatMessage message="blah blah blah" isUser={true} /> */}
+        {status == "streaming" && <ChatMessage message="..." />}
       </ScrollArea>
       <div className="mx-auto w-[70%] min-w-[70%] p-4">
         <label htmlFor="newMessage" className="sr-only">

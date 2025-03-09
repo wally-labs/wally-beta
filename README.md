@@ -87,7 +87,9 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] write sendMessage route
   - [x] test sendMessage call to openAI and check response
   - [x] stream ai responses
+  - [x] queries messages are added to the Messages object to send to OpenAI
   - [ ] structure response object so that we can personalize output
+  - [ ] add error handling, cancelling & regeneration to UI using vercel SDK
   - [ ] add context window library and tokenizer, figure out embedding
   - [ ] optimize speed and payload size
 
@@ -99,6 +101,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] /server
 
 - [ ] add image upload capabilities (not for demo)
+- [ ] optimize "use client" boundaries to make sure less CSR
 
 ### PRODUCTION
 
