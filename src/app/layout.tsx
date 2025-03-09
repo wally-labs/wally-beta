@@ -5,7 +5,7 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { ClerkProvider } from "@clerk/nextjs";
-import MainSidebar from "~/app/_components/global/nav-bar";
+import Home from "~/app/_components/global/home";
 
 import { SidebarProvider } from "@components/ui/sidebar";
 
@@ -24,7 +24,7 @@ export default function RootLayout({
         <body>
           <TRPCReactProvider>
             <SidebarProvider>
-              <MainSidebar>{children}</MainSidebar>
+              <Home>{children}</Home>
             </SidebarProvider>
           </TRPCReactProvider>
         </body>

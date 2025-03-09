@@ -2,11 +2,11 @@
 
 import { SidebarTrigger, useSidebar } from "@components/ui/sidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AppSidebar } from "./app-sidebar";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import { Header } from "./header";
+import { AppSidebar } from "./app-sidebar";
+import { HeroSection } from "./hero-section";
 
-export default function MainSidebar({
+export default function Home({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const { state } = useSidebar();
@@ -21,7 +21,7 @@ export default function MainSidebar({
           </>
         )}
       </AppSidebar>
-      <Header state={state}>{children}</Header>
+      <HeroSection state={state}>{children}</HeroSection>
     </>
   );
 }
