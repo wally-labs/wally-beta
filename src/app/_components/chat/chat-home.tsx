@@ -89,7 +89,7 @@ export default function ChatHome() {
       const queriedMessages: Message[] = dataMessages.map((message) => ({
         id: message.id,
         content: message.content,
-        role: message.messageBy === "USER" ? "user" : "system",
+        role: message.messageBy === "USER" ? "user" : "assistant",
       }));
       setMessages(queriedMessages);
     }
