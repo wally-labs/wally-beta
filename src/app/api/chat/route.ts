@@ -1,3 +1,5 @@
+import "server-only";
+
 import { openai } from "@ai-sdk/openai";
 import { type LanguageModelV1, streamText, type UIMessage } from "ai";
 // import { api } from "~/trpc/server";
@@ -14,16 +16,6 @@ export async function POST(req: Request) {
       emotion: string | undefined;
     };
 
-  // if (messages.length > 0) {
-  //   const lastMesage = messages[messages.length - 1];
-
-  //   await api.messages.saveMessage({
-  //     chatId,
-  //     content: lastMesage!.content,
-  //     messageBy: "USER",
-  //   });
-  // }
-
   const prompt = `You are Wally and you will act as a helpful and professional relationship wellness assistant. 
   The user is currently feeling ${emotion}.`;
 
@@ -31,24 +23,6 @@ export async function POST(req: Request) {
     model: model,
     messages: [{ role: "system", content: prompt }, ...messages],
   });
-
-  // (async () => {
-  //   let aiResponseText = "";
-  //   for await (const chunk of result.textStream) {
-  //     aiResponseText += chunk;
-  //   }
-  //   try {
-  //     await api.messages.saveMessage({
-  //       chatId,
-  //       content: aiResponseText,
-  //       messageBy: "WALLY",
-  //     });
-  //   } catch (err) {
-  //     console.error("Failed to save message from Wally", err);
-  //   }
-  // })().catch((err) => {
-  //   console.error("Error in async IIFE", err);
-  // });
 
   return result.toDataStreamResponse({
     getErrorMessage: (error) => {

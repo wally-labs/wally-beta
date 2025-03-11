@@ -91,7 +91,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [ ] structure response object so that we can personalize output
   - [ ] add error handling, cancelling & regeneration to UI using vercel SDK
   - [ ] add context window library and tokenizer, figure out embedding
-  - [ ] optimize speed and payload size
+  - [x] optimize speed and payload size
 
 - [x] clean up all code and add comments for ease of reading
 

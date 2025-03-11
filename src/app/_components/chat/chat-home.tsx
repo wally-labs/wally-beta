@@ -56,6 +56,16 @@ export default function ChatHome() {
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [shouldSubmit, setShouldSubmit] = useState(false);
 
+  // handle getting all previous messages from the db
+  const { data: dataMessages } = api.messages.getChatMessages.useQuery(
+    chatId ? { chatId: chatId } : skipToken,
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      enabled: !!chatId,
+    },
+  );
+
   // useChat() hook sends a HTTP POST request to /api/chat endpoint
   const {
     messages,
@@ -71,17 +81,57 @@ export default function ChatHome() {
       emotion: selectedEmotion,
       chatId: chatId,
     }),
-  });
+    onFinish: (assistantMessage, { usage, finishReason }) => {
+      void (async () => {
+        // for logging and debugging purposes, uncomment if necessary
+        console.log("Finished streaming message:", assistantMessage);
+        console.log("Token usage:", usage);
+        console.log("Finish reason:", finishReason);
 
-  // handle getting all previous messages from the db
-  const { data: dataMessages } = api.messages.getChatMessages.useQuery(
-    chatId ? { chatId: chatId } : skipToken,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      enabled: !!chatId,
+        // delay just to ensure the messages array is definitely updated
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        if (messages.length >= 2) {
+          const lastUserMessage = messages[messages.length - 2];
+          const lastAssistantMessage = messages[messages.length - 1];
+
+          // first try saving last user message
+          try {
+            await saveMessageMutation.mutateAsync({
+              chatId: chatId!,
+              content: lastUserMessage!.content,
+              messageBy: lastUserMessage!.role === "user" ? "USER" : "WALLY",
+            });
+            console.log("User message saved.");
+          } catch (error) {
+            console.error("Error saving user message:", error);
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 200));
+
+          // then try saving last assistant message
+          try {
+            await saveMessageMutation.mutateAsync({
+              chatId: chatId!,
+              content: lastAssistantMessage!.content,
+              messageBy:
+                lastAssistantMessage!.role === "user" ? "USER" : "WALLY",
+            });
+            console.log("Assistant message saved.");
+          } catch (error) {
+            console.error("Error saving assistant message:", error);
+          }
+        }
+      })();
     },
-  );
+    onResponse: (response) => {
+      console.log("Received HTTP response from server:", response);
+      // Optionally handle early response, or abort processing if needed.
+    },
+    onError: (error) => {
+      console.error("An error occurred:", error);
+    },
+  });
 
   // use setMessage to set queried messages into data to be sent to the openai api
   useEffect(() => {
@@ -95,7 +145,18 @@ export default function ChatHome() {
     }
   }, [dataMessages, setMessages]);
 
+  // saveMessageMutation
+  const saveMessageMutation = api.messages.saveMessage.useMutation({
+    onSuccess: () => {
+      console.log("Message saved to db successfully");
+    },
+    onError: (error) => {
+      console.error("Error saving message: ", error);
+    },
+  });
+
   // handles selecting an emotion from the dropdown menu, once emotion is set in state, should submit the message
+  // once message is ready to be submitted, save that message to the db
   const handleEmotionSubmit = (emotion: string) => {
     setSelectedEmotion(emotion);
     setShouldSubmit(true);
