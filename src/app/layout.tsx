@@ -11,7 +11,8 @@ import { SidebarProvider } from "@components/ui/sidebar";
 
 export const metadata: Metadata = {
   title: "Wally",
-  description: "Your personal wellness guru",
+  description:
+    "Wally is your personal AI relationship wellness assistant that offers offline communication tips to strengthen bonds and nurture healthier connections.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

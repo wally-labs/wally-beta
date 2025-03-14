@@ -26,10 +26,16 @@ interface Emotion {
 
 export default function ChatHome() {
   const emotions: Emotion[] = [
-    { emotion: "happy", emoji: "😊" },
+    { emotion: "joyful", emoji: "😊" },
     { emotion: "sad", emoji: "😔" },
     { emotion: "angry", emoji: "😡" },
+    { emotion: "fearful", emoji: "😨" },
+    { emotion: "disgusted", emoji: "🤢" },
+    { emotion: "surprised", emoji: "😲" },
+    { emotion: "sarcastic", emoji: "😏" },
+    { emotion: "flirty", emoji: "😘" },
     { emotion: "romantic", emoji: "🌹" },
+    { emotion: "neutral", emoji: "😐" },
   ];
 
   // object has the same name as the slug in the URL

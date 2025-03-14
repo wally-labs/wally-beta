@@ -63,6 +63,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] seed current users into vercel db
   - [x] user with no plan is rerouted to "/plans" page when navigating to 'new chat'
   - [x] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
+  - [ ] convert all restricted value fields to enums
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
 
 - [x] profile
