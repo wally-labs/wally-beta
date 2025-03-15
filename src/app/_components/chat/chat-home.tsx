@@ -86,10 +86,11 @@ export default function ChatHome() {
       messages,
       emotion: selectedEmotion,
       chatId: chatId,
+      profileData: dataChat,
     }),
     onFinish: (assistantMessage, { usage, finishReason }) => {
       void (async () => {
-        // for logging and debugging purposes, uncomment if necessary
+        // for logging and debugging purposes, uncomment if unnecessary
         console.log("Finished streaming message:", assistantMessage);
         console.log("Token usage:", usage);
         console.log("Finish reason:", finishReason);
