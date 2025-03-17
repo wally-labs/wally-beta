@@ -51,6 +51,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [ ] create one form component to be used across create-profile and update-profile
   - [ ] fix create-chat page ui (languages greyed out)
   - [ ] make sure scroll area in chat page sticks to the bottom
+  - [ ] chat area has a down area to scroll down
   - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
   - [ ] make ui mobile friendly (not for demo!)
 
@@ -79,8 +80,8 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] test chatHeaders routes
   - [x] figure out best routing conventions
   - [x] route createChat to new page with the chat once complete
-  - [ ] chat headers route only called once during login, or after create-chat invocation (not for demo)
   - [x] create chat scrollbox
+  - [ ] chat headers route only called once during login, or after create-chat invocation (not for demo)
 
 - [ ] openAI API (text-to-text)
 
@@ -89,6 +90,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] test sendMessage call to openAI and check response
   - [x] stream ai responses
   - [x] queries messages are added to the Messages object to send to OpenAI
+  - [x] add function to stop request, and retry on error
   - [ ] structure response object so that we can personalize output
   - [ ] add error handling, cancelling & regeneration to UI using vercel SDK
   - [ ] add context window library and tokenizer, figure out embedding

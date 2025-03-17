@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, CircleArrowRight } from "lucide-react";
+import { Heart, CircleArrowRight, StopCircle } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
@@ -18,6 +18,8 @@ import {
   DropdownMenuItem,
 } from "@components/ui/dropdown-menu";
 import UpdateProfile from "../profile/update-profile";
+import { Button } from "~/components/ui/button";
+import { toast } from "sonner";
 
 interface Emotion {
   emotion: string;
@@ -80,6 +82,8 @@ export default function ChatHome() {
     handleInputChange,
     handleSubmit,
     status,
+    stop,
+    reload,
   } = useChat({
     api: "/api/chat",
     experimental_prepareRequestBody: ({ messages }) => ({
@@ -136,7 +140,11 @@ export default function ChatHome() {
       // Optionally handle early response, or abort processing if needed.
     },
     onError: (error) => {
-      console.error("An error occurred:", error);
+      toast("An error occurred, ", {
+        description: error.name,
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        action: { label: "Retry", onClick: () => reload() },
+      });
     },
   });
 
@@ -236,28 +244,35 @@ export default function ChatHome() {
               onChange={handleInputChange}
             ></textarea>
             <div className="flex items-center gap-2 p-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <CircleArrowRight className="text-lg" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Emotions</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {emotions.map((e) => {
-                    return (
-                      <DropdownMenuItem
-                        key={e.emotion}
-                        onClick={() => {
-                          handleEmotionSubmit(e.emotion);
-                        }}
-                      >
-                        {e.emotion}
-                        <span>{e.emoji}</span>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {(status === "submitted" || status === "streaming") && (
+                <Button onClick={stop} variant="main">
+                  <StopCircle />
+                </Button>
+              )}
+              {status === "ready" && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <CircleArrowRight className="text-lg" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Emotions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {emotions.map((e) => {
+                      return (
+                        <DropdownMenuItem
+                          key={e.emotion}
+                          onClick={() => {
+                            handleEmotionSubmit(e.emotion);
+                          }}
+                        >
+                          {e.emotion}
+                          <span>{e.emoji}</span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </ShineBorder>
         </div>
