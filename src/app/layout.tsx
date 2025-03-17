@@ -8,6 +8,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Home from "~/app/_components/global/home";
 
 import { SidebarProvider } from "@components/ui/sidebar";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Wally",
@@ -26,6 +27,7 @@ export default function RootLayout({
           <TRPCReactProvider>
             <SidebarProvider>
               <Home>{children}</Home>
+              <Toaster />
             </SidebarProvider>
           </TRPCReactProvider>
         </body>

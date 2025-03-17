@@ -39,8 +39,8 @@ import {
   CommandItem,
   CommandList,
 } from "@components/ui/command";
-import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const formSchema = z.object({
   name: z.string().min(1),
@@ -77,35 +77,32 @@ export const languages = [
 export default function CreateProfile() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      gender: "",
-      birthDate: "",
-      relationship: "",
-      heartLevel: 1,
-      race: "",
-      country: "",
-      language: "",
-    },
+    // defaultValues: {
+    //   name: "",
+    //   gender: "",
+    //   birthDate: "",
+    //   relationship: "",
+    //   heartLevel: 1,
+    //   race: "",
+    //   country: "",
+    //   language: "",
+    // },
   });
 
   const router = useRouter();
   const createChatMutation = api.chat.createChat.useMutation({
     onSuccess: (data) => {
-      console.log("Profile created successfully: ", data);
+      toast.success(`Profile for ${data.name} created successfully!`);
       router.push(`/chats/${data.id}`);
     },
-    onError: (error) => {
-      console.log("Failed to create profile: ", error);
+    onError: () => {
+      toast.error(`Failed to create profile!`);
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     createChatMutation.mutate({ chatHeader: values.name, ...values });
   }
-
-  const { isSignedIn, userId } = useAuth();
-  console.log("isSignedIn: ", isSignedIn, "userId: ", userId);
 
   return (
     <div className="mx-auto mt-16 max-w-3xl p-4">

@@ -53,6 +53,7 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function UpdateProfile() {
   const { chats } = useParams();
@@ -69,10 +70,10 @@ export default function UpdateProfile() {
 
   const updateChatMutation = api.chat.updateChat.useMutation({
     onSuccess: () => {
-      console.log("Chat updated successfully");
+      toast.success("Profile updated successfully!");
     },
-    onError: (error) => {
-      console.error("Error updating chat", error);
+    onError: () => {
+      toast.error("Failed to update profile");
     },
   });
 

@@ -46,7 +46,7 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] update sidebar ui, completely hidden
   - [x] personify sidebar ui + classify by relationship maybe(?) (CAN be improved)
   - [x] create plans page
-  - [ ] create popup ui to be used throughout site for errors/successes etc..
+  - [x] create popup ui to be used throughout site for errors/successes etc..
   - [x] create update profile dialog box component
   - [ ] create one form component to be used across create-profile and update-profile
   - [ ] fix create-chat page ui (languages greyed out)
