@@ -101,10 +101,15 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
     - [x] all other pages
   - [x] /server
 
-- [ ] add image upload capabilities (not for demo)
-- [ ] optimize "use client" boundaries to make sure less CSR
-
 ### PRODUCTION
+
+- [ ] setup pinecone db namespace for each individual chat for context
+- [ ] add image/pdf upload capabilities
+
+  - [ ] upload from local
+  - [ ] upload from drive, dropbox etc.
+
+- [ ] optimize "use client" boundaries to make sure less CSR
 
 - [ ] performace optimization testing (w/ react-scan) (not for demo)
 

@@ -9,8 +9,8 @@ import { type LanguageModelV1, streamText, type UIMessage } from "ai";
 export async function POST(req: Request) {
   const model: LanguageModelV1 = openai(
     // ft:gpt-4o-mini-2024-07-18:personal:wally:BAqpHxk2, // training dataset #1 - 75 convos
-    "ft:gpt-4o-mini-2024-07-18:personal:wally:BArfmkN1", // training dataset #1 - 25 convos
-    // "gpt-4o-mini-2024-07-18",
+    // "ft:gpt-4o-mini-2024-07-18:personal:wally:BArfmkN1", // training dataset #1 - 25 convos
+    "gpt-4o-mini-2024-07-18",
   );
 
   const {
