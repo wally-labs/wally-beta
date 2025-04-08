@@ -9,6 +9,7 @@ import Home from "~/app/_components/global/home";
 
 import { SidebarProvider } from "@components/ui/sidebar";
 import { Toaster } from "sonner";
+import JotaiProvider from "./_components/global/jotai-provider";
 
 export const metadata: Metadata = {
   title: "Wally",
@@ -25,10 +26,12 @@ export default function RootLayout({
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
           <TRPCReactProvider>
-            <SidebarProvider>
-              <Home>{children}</Home>
-              <Toaster />
-            </SidebarProvider>
+            <JotaiProvider>
+              <SidebarProvider>
+                <Home>{children}</Home>
+                <Toaster />
+              </SidebarProvider>
+            </JotaiProvider>
           </TRPCReactProvider>
         </body>
       </html>
