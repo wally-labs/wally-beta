@@ -140,7 +140,7 @@ export default function ChatHome() {
       // Optionally handle early response, or abort processing if needed.
     },
     onError: (error) => {
-      toast("An error occurred, ", {
+      toast.error("An error occurred, ", {
         description: error.name,
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         action: { label: "Retry", onClick: () => reload() },
@@ -251,8 +251,10 @@ export default function ChatHome() {
               )}
               {status === "ready" && (
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <CircleArrowRight className="text-lg" />
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="main">
+                      <CircleArrowRight className="text-lg" />
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuLabel>Emotions</DropdownMenuLabel>

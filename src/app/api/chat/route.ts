@@ -1,12 +1,27 @@
 import "server-only";
 
-import type z from "zod";
+import z from "zod";
 import { type formSchema } from "~/app/_components/profile/create-profile";
 import { openai } from "@ai-sdk/openai";
-import { type LanguageModelV1, streamText, type UIMessage } from "ai";
-// import { profile } from "console";
+import {
+  type LanguageModelV1,
+  // streamText,
+  streamObject,
+  type UIMessage,
+} from "ai";
+import { type NextResponse, type NextRequest } from "next/server";
+// import { type IncomingMessage, type ServerResponse } from "http";
 
-export async function POST(req: Request) {
+const openAiElement = z.object({
+  type: z.string().describe("the html tag of the message"),
+  text: z.string().describe("the text content of the message"),
+});
+
+const openAiSchema = z.object({
+  elements: openAiElement.array(),
+});
+
+export async function POST(req: NextRequest) {
   const model: LanguageModelV1 = openai(
     // ft:gpt-4o-mini-2024-07-18:personal:wally:BAqpHxk2, // training dataset #1 - 75 convos
     // "ft:gpt-4o-mini-2024-07-18:personal:wally:BArfmkN1", // training dataset #1 - 25 convos
@@ -52,36 +67,39 @@ export async function POST(req: Request) {
   const emotionPrompt = `The user is currently feeling ${emotion}. Tailor your responses to be more empathetic towards
   the user's current emotional state.`;
 
-  console.log(
-    `system prompt: ${systemPrompt}, context prompt: ${contextPrompt}, emotion prompt: ${emotionPrompt}`,
-  );
-
-  const result = streamText({
+  const result = streamObject({
     model: model,
+    schema: openAiSchema,
+    schemaName: "Wally Relationship Assistant Response",
+    schemaDescription:
+      "A message object with type (h1, h2, h3, p, etc.) and text.",
     messages: [
-      { role: "system", content: systemPrompt },
-      { role: "system", content: contextPrompt },
-      { role: "system", content: emotionPrompt },
+      {
+        role: "system",
+        content: systemPrompt + " " + contextPrompt + " " + emotionPrompt,
+      },
       ...messages,
     ],
   });
 
-  return result.toDataStreamResponse({
-    getErrorMessage: (error) => {
-      if (error == null) {
-        return "unknown error";
-      }
+  // return result.toDataStreamResponse({
+  //   getErrorMessage: (error) => {
+  //     if (error == null) {
+  //       return "Unknown error occurred.";
+  //     }
 
-      if (typeof error === "string") {
-        return error;
-      }
+  //     if (typeof error === "string") {
+  //       return error;
+  //     }
 
-      if (error instanceof Error) {
-        return error.message;
-      }
+  //     if (error instanceof Error) {
+  //       return error.message;
+  //     }
 
-      return JSON.stringify(error);
-    },
-    sendUsage: false,
-  });
+  //     return JSON.stringify(error);
+  //   },
+  //   sendUsage: false,
+  // });
+
+  return result.createDataStreamResponse({});
 }

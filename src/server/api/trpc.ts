@@ -11,9 +11,8 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-// import { auth } from "~/server/auth";
 import { auth } from "@clerk/nextjs/server";
-import { db } from "~/server/db";
+import { db, pinecone } from "~/server/db";
 
 /**
  * 1. CONTEXT
@@ -34,6 +33,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
 
   return {
     db,
+    pinecone,
     session,
     ...opts,
   };
