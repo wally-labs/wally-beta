@@ -28,12 +28,18 @@ import {
   DropdownMenuTrigger,
 } from "@components/ui/dropdown-menu";
 
+import Link from "next/link";
+
 import { api } from "~/trpc/react";
 import { useAuth } from "@clerk/nextjs";
-import Link from "next/link";
+import { useAtom, useSetAtom } from "jotai";
+import { chatDataAtom, chatIdsAtom } from "../atoms";
+import { useEffect } from "react";
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const state = useAuth();
+  const setChatIds = useSetAtom(chatIdsAtom);
+  const [chatData, setChatData] = useAtom(chatDataAtom);
 
   const { data, isLoading, isSuccess } = api.chat.getAllChatHeaders.useQuery(
     undefined,
@@ -55,6 +61,34 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   function deleteChat(chatId: string) {
     deleteChatMutation.mutate({ chatId });
   }
+
+  useEffect(() => {
+    // set all chatIds and chatData to the atoms, when new data arrives
+    if (data && data.length > 0) {
+      const chatIds = data.map((chat) => chat.id);
+      const chatData = data.map(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ({ id, createdAt, birthDate, race, country, ...rest }) => ({
+          id: id,
+          chatData: {
+            ...rest,
+            race: race ?? undefined,
+            country: country ?? undefined,
+            chatHeader: rest.name,
+            birthDate: birthDate
+              ? new Date(birthDate).toISOString()
+              : undefined,
+          },
+        }),
+      );
+
+      setChatIds(chatIds);
+      setChatData(chatData);
+
+      console.log("Chat IDs: ", chatIds);
+      console.log("Chat Data: ", chatData);
+    }
+  }, [data, setChatIds, setChatData]);
 
   return (
     <Sidebar>
@@ -87,14 +121,13 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                   <SidebarMenuSkeleton showIcon />
                 </SidebarMenuItem>
               )}
-              {isSuccess &&
-                data.length > 0 &&
-                data.map((chat) => (
+              {chatData.length > 0 &&
+                chatData.map((chat) => (
                   <SidebarMenuItem key={chat.id}>
                     <SidebarMenuButton asChild>
                       <Link href={`/chats/${chat.id}`}>
                         <CircleUserRound />
-                        <span>{chat.chatHeader}</span>
+                        <span>{chat.chatData.chatHeader}</span>
                       </Link>
                     </SidebarMenuButton>
                     <DropdownMenu>
@@ -130,9 +163,9 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
       </SidebarContent>
       <SidebarFooter className="mb-4">
         <SidebarMenu>
-          <SidebarMenuItem key={"user-profile"} className="mx-auto">
+          <SidebarMenuItem key="upgrade-plan" className="mx-auto">
             <SidebarMenuButton asChild>
-              <Link href="#">
+              <Link href="/plans">
                 <CircleFadingArrowUp />
                 <span>Upgrade plan</span>
               </Link>

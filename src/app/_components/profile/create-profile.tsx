@@ -8,7 +8,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 
-import { ProfileForm, formSchema } from "./profile-form";
+import { ProfileForm } from "./profile-form";
+import { formSchema } from "../schema";
 
 export default function CreateProfile() {
   const form = useForm<z.infer<typeof formSchema>>({

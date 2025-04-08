@@ -131,7 +131,15 @@ export const chatRouter = createTRPCRouter({
       select: {
         id: true,
         chatHeader: true,
-        updatedAt: true,
+        name: true,
+        gender: true,
+        birthDate: true,
+        relationship: true,
+        heartLevel: true,
+        race: true,
+        country: true,
+        language: true,
+        createdAt: true,
       },
     });
 
