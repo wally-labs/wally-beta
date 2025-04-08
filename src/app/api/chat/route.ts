@@ -1,7 +1,7 @@
 import "server-only";
 
 import z from "zod";
-import { type formSchema } from "~/app/_components/profile/create-profile";
+import { type formSchema } from "~/app/_components/schema";
 import { openai } from "@ai-sdk/openai";
 import {
   type LanguageModelV1,

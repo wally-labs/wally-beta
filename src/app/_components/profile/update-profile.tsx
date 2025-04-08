@@ -20,13 +20,14 @@ import { Button } from "@components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { formSchema, ProfileForm } from "./profile-form";
+import { ProfileForm } from "./profile-form";
+import { formSchema } from "../schema";
 
 export default function UpdateProfile() {
   const { chats } = useParams();
   const chatId = Array.isArray(chats) ? chats[0] : chats;
 
-  const { data, isLoading, isSuccess } = api.chat.getChat.useQuery(
+  const { data } = api.chat.getChat.useQuery(
     chatId ? { chatId: chatId } : skipToken,
     {
       refetchOnWindowFocus: false,
