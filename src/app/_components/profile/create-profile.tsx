@@ -12,6 +12,8 @@ import { ProfileForm } from "./profile-form";
 import { formSchema } from "../schema";
 
 export default function CreateProfile() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -26,7 +28,6 @@ export default function CreateProfile() {
     },
   });
 
-  const router = useRouter();
   const createChatMutation = api.chat.createChat.useMutation({
     onSuccess: (data) => {
       toast.success(`Profile for ${data.name} created successfully!`);
@@ -55,7 +56,7 @@ export default function CreateProfile() {
     <div className="mx-auto mt-16 max-w-3xl p-4">
       <ProfileForm
         form={form}
-        onSubmit={onSubmit}
+        handleSubmit={onSubmit}
         submitLabel="Create Profile"
       />
     </div>

@@ -20,45 +20,57 @@ import {
 import UpdateProfile from "../profile/update-profile";
 import { Button } from "~/components/ui/button";
 import { toast } from "sonner";
+import { useAtomValue } from "jotai";
+import { useCurrentChatData } from "../atoms";
 
 interface Emotion {
   emotion: string;
   emoji: string;
 }
 
-export default function ChatHome() {
-  const emotions: Emotion[] = [
-    { emotion: "joyful", emoji: "😊" },
-    { emotion: "sad", emoji: "😔" },
-    { emotion: "angry", emoji: "😡" },
-    { emotion: "fearful", emoji: "😨" },
-    { emotion: "disgusted", emoji: "🤢" },
-    { emotion: "surprised", emoji: "😲" },
-    { emotion: "sarcastic", emoji: "😏" },
-    { emotion: "flirty", emoji: "😘" },
-    { emotion: "romantic", emoji: "🌹" },
-    { emotion: "neutral", emoji: "😐" },
-  ];
+const emotions: Emotion[] = [
+  { emotion: "joyful", emoji: "😊" },
+  { emotion: "sad", emoji: "😔" },
+  { emotion: "angry", emoji: "😡" },
+  { emotion: "fearful", emoji: "😨" },
+  { emotion: "disgusted", emoji: "🤢" },
+  { emotion: "surprised", emoji: "😲" },
+  { emotion: "sarcastic", emoji: "😏" },
+  { emotion: "flirty", emoji: "😘" },
+  { emotion: "romantic", emoji: "🌹" },
+  { emotion: "neutral", emoji: "😐" },
+];
 
+export default function ChatHome() {
   // object has the same name as the slug in the URL
   const { chats } = useParams();
   const chatId = Array.isArray(chats) ? chats[0] : chats;
 
-  // handles getting profile data from the db and setting it in the UI
-  const {
-    data: dataChat,
-    isLoading: isLoadingChat,
-    isSuccess: isSuccessChat,
-  } = api.chat.getChat.useQuery(chatId ? { chatId: chatId } : skipToken, {
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    enabled: !!chatId,
-  });
+  // get profile data from atom earlier and set UI
+  const focusedChatData = useCurrentChatData(chatId!);
+  const focusedChat = useAtomValue(focusedChatData);
+  const chatData = focusedChat?.chatData;
 
-  const redHeartLevel = dataChat?.heartLevel;
-  const relationship = dataChat?.relationship;
-  const name = dataChat?.name;
+  const redHeartLevel = chatData?.heartLevel;
+  const relationship = chatData?.relationship;
+  const name = chatData?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
+
+  // handles getting profile data from the db and setting it in the UI
+  // const {
+  //   data: dataChat,
+  //   isLoading: isLoadingChat,
+  //   isSuccess: isSuccessChat,
+  // } = api.chat.getChat.useQuery(chatId ? { chatId: chatId } : skipToken, {
+  //   refetchOnWindowFocus: false,
+  //   refetchOnMount: false,
+  //   enabled: !!chatId,
+  // });
+
+  // const redHeartLevel = dataChat?.heartLevel;
+  // const relationship = dataChat?.relationship;
+  // const name = dataChat?.name;
+  // const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
 
   // handle openai api call
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -90,7 +102,8 @@ export default function ChatHome() {
       messages,
       emotion: selectedEmotion,
       chatId: chatId,
-      profileData: dataChat,
+      // profileData: dataChat,
+      profileData: chatData,
     }),
     onFinish: (assistantMessage, { usage, finishReason }) => {
       void (async () => {
@@ -190,18 +203,12 @@ export default function ChatHome() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
       <div className="flex h-[10%] w-[70%] items-center justify-between space-x-2">
         <div className="flex">
-          {isLoadingChat &&
-            Array.from({ length: 5 }).map((_, i) => (
-              <Heart key={i} className="text-gray-500" />
-            ))}
-          {isSuccessChat &&
-            Array.from({ length: redHeartLevel! }).map((_, i) => (
-              <Heart key={i} className="text-red-500" />
-            ))}
-          {isSuccessChat &&
-            Array.from({ length: grayHeartLevel }).map((_, i) => (
-              <Heart key={i} className="text-gray-500" />
-            ))}
+          {Array.from({ length: redHeartLevel! }).map((_, i) => (
+            <Heart key={i} className="text-red-500" />
+          ))}
+          {Array.from({ length: grayHeartLevel }).map((_, i) => (
+            <Heart key={i} className="text-gray-500" />
+          ))}
         </div>
         <div>
           <h2 className="text-3xl font-bold text-red-600">{name} 🌹</h2>
