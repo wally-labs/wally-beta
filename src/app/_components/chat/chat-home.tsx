@@ -9,7 +9,6 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 import {
   useChat,
   type Message,
-  experimental_useObject as useObject,
 } from "@ai-sdk/react";
 import { useEffect, useState } from "react";
 import ShineBorder from "@components/ui/shine-border";
@@ -21,11 +20,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@components/ui/dropdown-menu";
-import UpdateProfile from "../profile/update-profile";
-import { Button } from "~/components/ui/button";
+import { Button } from "@components/ui/button";
 import { toast } from "sonner";
+
+import UpdateProfile from "../profile/update-profile";
 import { useAtomValue } from "jotai";
 import { useCurrentChatData } from "../atoms";
+import { marked } from "marked";
 
 interface Emotion {
   emotion: string;
@@ -226,16 +227,30 @@ export default function ChatHome() {
       </div>
       <ScrollArea className="mx-auto flex h-[500px] w-[70%] min-w-[70%] flex-col space-y-2 overflow-y-auto rounded-md border pb-2">
         {/* placeholder because the UI is not fixed yet */}
-        <ChatMessage message="Hello! I'm Wally, your relationship wellness assistant. How can I help you today?" />
+        <ChatMessage>Hello! I&apos;m Wally, your relationship wellness assistant. How can I help you today?</ChatMessage>
         {/* map each message in messages[] to a <ChatMessage> Component */}
-        {messages.map((message, index) => (
-          <ChatMessage
-            key={index}
-            message={message.content}
-            isUser={message.role === "user"}
-          />
-        ))}
-        {status == "streaming" && <ChatMessage message="..." />}
+        {messages.map((message, index) =>
+          message.parts.map((part, i) => (
+            <ChatMessage
+              key={index}
+              isUser={message.role === "user"}
+            >
+              {part.type === "text" && (
+                <div
+                  key={i}
+                  className="prose max-w-full"
+                  dangerouslySetInnerHTML={{ __html: marked(part.text) }}
+                />
+              )}
+              {// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                part.type === "source" && (<a key={i} href={part.source.url}>{part.source.url}</a>)}
+              {part.type === "reasoning" && (<div key={i}>{part.reasoning}</div>)}
+              {part.type === "tool-invocation" && (<div key={i}>{part.toolInvocation.toolName}</div>)}
+              {/* {part.type === "file" && (<img key={i} src={`data:${part.mimeType};base64,${part.data}`} />)} */}
+            </ChatMessage>
+          ))
+        )}
+        {status == "streaming" && <ChatMessage>...</ChatMessage>}
       </ScrollArea>
       <div className="mx-auto w-[70%] min-w-[70%] p-4">
         <label htmlFor="newMessage" className="sr-only">
