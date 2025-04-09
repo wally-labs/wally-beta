@@ -1,6 +1,4 @@
-"use client";
-
-import { z } from "zod";
+import { type z } from "zod";
 import { cn } from "~/lib/utils";
 import { type useForm } from "react-hook-form";
 
@@ -55,14 +53,18 @@ export const languages = [
 
 type ProfileFormProps = {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  handleSubmit: (values: z.infer<typeof formSchema>) => void;
   submitLabel: string;
 };
 
-export function ProfileForm({ form, onSubmit, submitLabel }: ProfileFormProps) {
+export function ProfileForm({
+  form,
+  handleSubmit,
+  submitLabel,
+}: ProfileFormProps) {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         {/* Name field */}
         <FormField
           control={form.control}

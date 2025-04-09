@@ -21,6 +21,7 @@ import {
   MoreHorizontal,
   Plus,
 } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,13 +42,10 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   const setChatIds = useSetAtom(chatIdsAtom);
   const [chatData, setChatData] = useAtom(chatDataAtom);
 
-  const { data, isLoading, isSuccess } = api.chat.getAllChatHeaders.useQuery(
-    undefined,
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    },
-  );
+  const { data, isLoading } = api.chat.getAllChatHeaders.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
   const deleteChatMutation = api.chat.deleteChat.useMutation({
     onSuccess: (data) => {

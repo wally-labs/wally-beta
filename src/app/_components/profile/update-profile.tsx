@@ -1,5 +1,3 @@
-"use client";
-
 import { type z } from "zod";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
@@ -96,7 +94,7 @@ export default function UpdateProfile() {
           </DialogHeader>
           <ProfileForm
             form={form}
-            onSubmit={onSubmit}
+            handleSubmit={onSubmit}
             submitLabel="Update Profile"
           />
         </ScrollArea>
