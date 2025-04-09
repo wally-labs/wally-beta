@@ -9,7 +9,7 @@ import {
   streamObject,
   type UIMessage,
 } from "ai";
-import { type NextResponse, type NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 // import { type IncomingMessage, type ServerResponse } from "http";
 
 const openAiElement = z.object({
@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
 
   const result = streamObject({
     model: model,
+    output: "array",
     schema: openAiSchema,
     schemaName: "Wally Relationship Assistant Response",
     schemaDescription:
@@ -101,5 +102,20 @@ export async function POST(req: NextRequest) {
   //   sendUsage: false,
   // });
 
-  return result.createDataStreamResponse({});
+  return result.toTextStreamResponse({
+    status: 200,
+    getErrorMessage: (error) => {
+      if (error == null) {
+        return "Unknown error occurred.";
+      }
+      if (typeof error === "string") {
+        return error;
+      }
+      if (error instanceof Error) {
+        return error.message;
+      }
+      return JSON.stringify(error);
+    },
+    sendUsage: false,
+  });
 }
