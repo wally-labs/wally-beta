@@ -6,10 +6,7 @@ import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { skipToken } from "@tanstack/react-query";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import {
-  useChat,
-  type Message,
-} from "@ai-sdk/react";
+import { useChat, type Message } from "@ai-sdk/react";
 import { useEffect, useState } from "react";
 import ShineBorder from "@components/ui/shine-border";
 import {
@@ -61,22 +58,6 @@ export default function ChatHome() {
   const name = chatData?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
 
-  // handles getting profile data from the db and setting it in the UI
-  // const {
-  //   data: dataChat,
-  //   isLoading: isLoadingChat,
-  //   isSuccess: isSuccessChat,
-  // } = api.chat.getChat.useQuery(chatId ? { chatId: chatId } : skipToken, {
-  //   refetchOnWindowFocus: false,
-  //   refetchOnMount: false,
-  //   enabled: !!chatId,
-  // });
-
-  // const redHeartLevel = dataChat?.heartLevel;
-  // const relationship = dataChat?.relationship;
-  // const name = dataChat?.name;
-  // const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
-
   // handle openai api call
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [shouldSubmit, setShouldSubmit] = useState(false);
@@ -111,51 +92,26 @@ export default function ChatHome() {
       profileData: chatData,
     }),
     onFinish: (assistantMessage, { usage, finishReason }) => {
-      void (async () => {
-        // for logging and debugging purposes, uncomment if unnecessary
-        console.log("Finished streaming message:", assistantMessage);
-        console.log("Token usage:", usage);
-        console.log("Finish reason:", finishReason);
+      // for logging and debugging purposes
+      // console.log("Finished streaming message:", assistantMessage);
+      console.log("Token usage:", usage);
+      console.log("Finish reason:", finishReason);
 
-        // delay just to ensure the messages array is definitely updated
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      // try saving assistant message to db
+      try {
+        void saveMessageMutation.mutate({
+          chatId: chatId!,
+          content: assistantMessage.content,
+          messageBy: "WALLY",
+        });
 
-        if (messages.length >= 2) {
-          const lastUserMessage = messages[messages.length - 2];
-          const lastAssistantMessage = messages[messages.length - 1];
-
-          // first try saving last user message
-          try {
-            await saveMessageMutation.mutateAsync({
-              chatId: chatId!,
-              content: lastUserMessage!.content,
-              messageBy: lastUserMessage!.role === "user" ? "USER" : "WALLY",
-            });
-            console.log("User message saved.");
-          } catch (error) {
-            console.error("Error saving user message:", error);
-          }
-
-          await new Promise((resolve) => setTimeout(resolve, 200));
-
-          // then try saving last assistant message
-          try {
-            await saveMessageMutation.mutateAsync({
-              chatId: chatId!,
-              content: lastAssistantMessage!.content,
-              messageBy:
-                lastAssistantMessage!.role === "user" ? "USER" : "WALLY",
-            });
-            console.log("Assistant message saved.");
-          } catch (error) {
-            console.error("Error saving assistant message:", error);
-          }
-        }
-      })();
+        console.log("Finished saving assistant message: ", assistantMessage);
+      } catch (error) {
+        console.error("Error saving assistant message:", error);
+      }
     },
     onResponse: (response) => {
       console.log("Received HTTP response from server:", response);
-      // Optionally handle early response, or abort processing if needed.
     },
     onError: (error) => {
       toast.error("An error occurred, ", {
@@ -197,11 +153,21 @@ export default function ChatHome() {
 
   // useEffect to handle submitting the message once shouldSubmit is set to true
   useEffect(() => {
-    if (shouldSubmit) {
+    if (shouldSubmit && chatId && input) {
+      // try saving user message to db before calling handleSubmit()
+      const userMessage = input;
+      void saveMessageMutation.mutate({
+        chatId: chatId,
+        content: userMessage,
+        messageBy: "USER",
+      });
+
+      console.log("Finished saving user message: ", userMessage);
+
       handleSubmit();
       setShouldSubmit(false);
     }
-  }, [shouldSubmit, handleSubmit]);
+  }, [shouldSubmit, handleSubmit, chatId, input, saveMessageMutation]);
 
   return (
     // DIVIDE into components once ui is decided -> components take in heart level as input and return ui accordingly
@@ -227,14 +193,14 @@ export default function ChatHome() {
       </div>
       <ScrollArea className="mx-auto flex h-[500px] w-[70%] min-w-[70%] flex-col space-y-2 overflow-y-auto rounded-md border pb-2">
         {/* placeholder because the UI is not fixed yet */}
-        <ChatMessage>Hello! I&apos;m Wally, your relationship wellness assistant. How can I help you today?</ChatMessage>
+        <ChatMessage>
+          Hello! I&apos;m Wally, your relationship wellness assistant. How can I
+          help you today?
+        </ChatMessage>
         {/* map each message in messages[] to a <ChatMessage> Component */}
         {messages.map((message, index) =>
           message.parts.map((part, i) => (
-            <ChatMessage
-              key={index}
-              isUser={message.role === "user"}
-            >
+            <ChatMessage key={`${index}-${i}`} isUser={message.role === "user"}>
               {part.type === "text" && (
                 <div
                   key={i}
@@ -242,13 +208,18 @@ export default function ChatHome() {
                   dangerouslySetInnerHTML={{ __html: marked(part.text) }}
                 />
               )}
-              {// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                part.type === "source" && (<a key={i} href={part.source.url}>{part.source.url}</a>)}
-              {part.type === "reasoning" && (<div key={i}>{part.reasoning}</div>)}
-              {part.type === "tool-invocation" && (<div key={i}>{part.toolInvocation.toolName}</div>)}
+              {part.type === "source" && (
+                <a key={i} href={part.source.url}>
+                  {part.source.url}
+                </a>
+              )}
+              {part.type === "reasoning" && <div key={i}>{part.reasoning}</div>}
+              {part.type === "tool-invocation" && (
+                <div key={i}>{part.toolInvocation.toolName}</div>
+              )}
               {/* {part.type === "file" && (<img key={i} src={`data:${part.mimeType};base64,${part.data}`} />)} */}
             </ChatMessage>
-          ))
+          )),
         )}
         {status == "streaming" && <ChatMessage>...</ChatMessage>}
       </ScrollArea>

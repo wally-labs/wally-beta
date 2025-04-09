@@ -82,9 +82,6 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
 
       setChatIds(chatIds);
       setChatData(chatData);
-
-      console.log("Chat IDs: ", chatIds);
-      console.log("Chat Data: ", chatData);
     }
   }, [data, setChatIds, setChatData]);
 
