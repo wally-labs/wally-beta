@@ -19,6 +19,8 @@ import {
 } from "@components/ui/dropdown-menu";
 import { Button } from "@components/ui/button";
 import { toast } from "sonner";
+import { useAtomValue } from "jotai";
+import { useCurrentChatData } from "../atoms";
 
 import UpdateProfile from "../profile/update-profile";
 import { useAtomValue } from "jotai";
@@ -57,6 +59,22 @@ export default function ChatHome() {
   const relationship = chatData?.relationship;
   const name = chatData?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
+
+  // handles getting profile data from the db and setting it in the UI
+  // const {
+  //   data: dataChat,
+  //   isLoading: isLoadingChat,
+  //   isSuccess: isSuccessChat,
+  // } = api.chat.getChat.useQuery(chatId ? { chatId: chatId } : skipToken, {
+  //   refetchOnWindowFocus: false,
+  //   refetchOnMount: false,
+  //   enabled: !!chatId,
+  // });
+
+  // const redHeartLevel = dataChat?.heartLevel;
+  // const relationship = dataChat?.relationship;
+  // const name = dataChat?.name;
+  // const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
 
   // handle openai api call
   const [selectedEmotion, setSelectedEmotion] = useState("");
