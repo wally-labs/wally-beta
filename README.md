@@ -1,42 +1,8 @@
-# Create T3 App
+# Wally
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. Wally provides contextual responses tailored towards Singlish & Chinese users. Check out our MVP at the release link below!
 
-## What's next? How do I make an app with this?
-
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
-
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
-
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
-
-## How to initialize?
-
-```
-pnpm create t3-app@latest
-```
-
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
-
-## To-do list
-
-### DEMO
+## TO-DO LIST
 
 - [ ] front-end
 
@@ -48,11 +14,17 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] create plans page
   - [x] create popup ui to be used throughout site for errors/successes etc..
   - [x] create update profile dialog box component
-  - [ ] create one form component to be used across create-profile and update-profile
+  - [x] create one form component to be used across create-profile and update-profile
+  - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
+  - [ ] add image/pdf upload functionality (uploads from device/gdrive/dropbox)
+  - [ ] updateProfile functionality (birthdate and heartLevel does not render default value)
+  - [ ] update frontEnd to show 3 different dropdowns for responses
+
+- [ ] UI/UX
+
   - [ ] fix create-chat page ui (languages greyed out)
   - [ ] make sure scroll area in chat page sticks to the bottom
   - [ ] chat area has a down area to scroll down
-  - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
   - [ ] make ui mobile friendly (not for demo!)
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
@@ -64,8 +36,10 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] seed current users into vercel db
   - [x] user with no plan is rerouted to "/plans" page when navigating to 'new chat'
   - [x] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
+  - [ ] procedure to update chats's updatedAt (arrange chats by updatedAt, not createdAt)
   - [ ] convert all restricted value fields to enums
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
+  - [ ] convert to personal providers for auth
 
 - [x] profile
 
@@ -91,35 +65,32 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
   - [x] stream ai responses
   - [x] queries messages are added to the Messages object to send to OpenAI
   - [x] add function to stop request, and retry on error
-  - [ ] structure response object so that we can personalize output
+  - [x] structure response object so that we can personalize output
+  - [ ] implement RAG (data flow issues) + Pinecone
+  - [ ] indiv pinecone namespace for each user -> id prefixes for each profile
+  - [ ] return multiple responses before beta release (completion.choices[0,1,2..]?)
   - [ ] add error handling, cancelling & regeneration to UI using vercel SDK
-  - [ ] add context window library and tokenizer, figure out embedding
   - [x] optimize speed and payload size
+  - [ ] add context window library and tokenizer, figure out embedding
+  - [ ] able to send image/pdf upload capabilities
 
-- [x] clean up all code and add comments for ease of reading
+### OPTIMIZATION
 
-  - [x] /app
-    - [x] /\_components
-    - [x] all other pages
-  - [x] /server
+- [ ] optimize "use client" boundaries to for less CSR
+- [ ] optimization testing (w/ react-scan)
 
-### PRODUCTION
-
-- [ ] setup pinecone db namespace for each individual chat for context
-- [ ] add image/pdf upload capabilities
-
-  - [ ] upload from local
-  - [ ] upload from drive, dropbox etc.
-
-- [ ] optimize "use client" boundaries to make sure less CSR
-
-- [ ] performace optimization testing (w/ react-scan) (not for demo)
-
-  - [ ] optimize front-end data fetching with react-query
-  - [ ] learn all different types of queries
   - [ ] minimize rerenders
-  - [ ] integrate react context api, if necessary..
-  - [ ] try out abort controller
+  - [ ] use different types of queries
+  - [ ] try abort controller
+
+- [x] integrate global state management - jotai (atomic state)
+
+  - [x] store all chatHeader data (everyth except messages)
+  - [x] use atomic state for chatHome page
+  - [ ] sort (according to updatedAt) before displaying chatData on frontend
+  - [ ] update profile -> updates focusedChatData atom
+  - [ ] delete profile -> delete focusedChatData atom
+  - [ ] user sends message -> update updatedAt of focusedChatData atom
 
 - [ ] separate dbs for production and dev (w/ vercel - paid, not for demo)
 - [ ] check auth caching state (not for demo?)
