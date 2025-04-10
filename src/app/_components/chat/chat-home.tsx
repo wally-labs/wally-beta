@@ -19,8 +19,6 @@ import {
 } from "@components/ui/dropdown-menu";
 import { Button } from "@components/ui/button";
 import { toast } from "sonner";
-import { useAtomValue } from "jotai";
-import { useCurrentChatData } from "../atoms";
 
 import UpdateProfile from "../profile/update-profile";
 import { useAtomValue } from "jotai";
