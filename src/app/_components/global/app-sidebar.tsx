@@ -33,13 +33,12 @@ import Link from "next/link";
 
 import { api } from "~/trpc/react";
 import { useAuth } from "@clerk/nextjs";
-import { useAtom, useSetAtom } from "jotai";
-import { chatDataAtom, chatIdsAtom } from "../atoms";
+import { useAtom } from "jotai";
+import { chatDataAtom } from "../atoms";
 import { useEffect } from "react";
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
   const state = useAuth();
-  const setChatIds = useSetAtom(chatIdsAtom);
   const [chatData, setChatData] = useAtom(chatDataAtom);
 
   const { data, isLoading } = api.chat.getAllChatHeaders.useQuery(undefined, {
@@ -63,27 +62,41 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // set all chatIds and chatData to the atoms, when new data arrives
     if (data && data.length > 0) {
-      const chatIds = data.map((chat) => chat.id);
-      const chatData = data.map(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ({ id, createdAt, birthDate, race, country, ...rest }) => ({
-          id: id,
-          chatData: {
-            ...rest,
-            race: race ?? undefined,
-            country: country ?? undefined,
-            chatHeader: rest.name,
-            birthDate: birthDate
-              ? new Date(birthDate).toISOString()
-              : undefined,
-          },
-        }),
-      );
+      const chatData = data
+        // sort chatData by updatedAt date
+        .sort((a, b) => {
+          return (
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+        })
+        .map(
+          ({
+            id,
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            createdAt,
+            updatedAt,
+            birthDate,
+            race,
+            country,
+            ...rest
+          }) => ({
+            id: id,
+            chatData: {
+              ...rest,
+              race: race ?? undefined,
+              country: country ?? undefined,
+              chatHeader: rest.name,
+              birthDate: birthDate
+                ? new Date(birthDate).toISOString()
+                : undefined,
+              updatedAt: new Date(updatedAt).toISOString(),
+            },
+          }),
+        );
 
-      setChatIds(chatIds);
       setChatData(chatData);
     }
-  }, [data, setChatIds, setChatData]);
+  }, [data, setChatData]);
 
   return (
     <Sidebar>

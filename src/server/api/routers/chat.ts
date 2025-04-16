@@ -142,6 +142,7 @@ export const chatRouter = createTRPCRouter({
         country: true,
         language: true,
         createdAt: true,
+        updatedAt: true,
       },
     });
 

@@ -1,7 +1,3 @@
-// /* eslint-disable @typescript-eslint/no-unsafe-argument */
-// /* eslint-disable @typescript-eslint/no-unsafe-call */
-// /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-// /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import type { WebhookEvent } from "@clerk/nextjs/server";
@@ -109,7 +105,6 @@ export async function POST(req: Request) {
   }
   const eventType = evt.type;
   console.log(`Received webhook with ID ${id} and event type of ${eventType}`);
-  console.log("Webhook payload:", body);
 
   if (evt.type === "user.created") {
     const {
@@ -132,7 +127,6 @@ export async function POST(req: Request) {
       email = emailObj.email_address;
     }
 
-    console.log("userId created:", evt.data.id);
     const user = await api.user.createUser({
       id,
       name,

@@ -16,6 +16,7 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] create update profile dialog box component
   - [x] create one form component to be used across create-profile and update-profile
   - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
+  - [ ] link user session to jotai state
   - [ ] add image/pdf upload functionality (uploads from device/gdrive/dropbox)
   - [ ] updateProfile functionality (birthdate and heartLevel does not render default value)
   - [ ] update frontEnd to show 3 different dropdowns for responses
@@ -24,7 +25,7 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
 
   - [ ] fix create-chat page ui (languages greyed out)
   - [ ] make sure scroll area in chat page sticks to the bottom
-  - [ ] chat area has a down area to scroll down
+  - [ ] chat area has a down button to scroll down
   - [ ] make ui mobile friendly (not for demo!)
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
@@ -36,7 +37,7 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] seed current users into vercel db
   - [x] user with no plan is rerouted to "/plans" page when navigating to 'new chat'
   - [x] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
-  - [ ] procedure to update chats's updatedAt (arrange chats by updatedAt, not createdAt)
+  - [x] procedure to update chats's updatedAt (arrange chats by updatedAt, not createdAt)
   - [ ] convert all restricted value fields to enums
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
   - [ ] convert to personal providers for auth
@@ -87,10 +88,10 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
 
   - [x] store all chatHeader data (everyth except messages)
   - [x] use atomic state for chatHome page
-  - [ ] sort (according to updatedAt) before displaying chatData on frontend
-  - [ ] update profile -> updates focusedChatData atom
-  - [ ] delete profile -> delete focusedChatData atom
-  - [ ] user sends message -> update updatedAt of focusedChatData atom
+  - [x] sort (according to updatedAt) before displaying chatData on frontend
+  - [x] update profile -> updates focusedChatData atom
+  - [x] delete profile -> removes ref to focusedChatData atom
+  - [x] user sends message -> update updatedAt of focusedChatData atom
 
 - [ ] separate dbs for production and dev (w/ vercel - paid, not for demo)
 - [ ] check auth caching state (not for demo?)

@@ -93,6 +93,14 @@ export const messagesRouter = createTRPCRouter({
       const { chatId, content, messageBy } = input;
 
       try {
+        // update chat with the chatId
+        await ctx.db.chat.update({
+          where: { id: chatId },
+          data: {
+            updatedAt: new Date(),
+          },
+        });
+
         const message = await ctx.db.messages.create({
           data: {
             chatId,

@@ -20,11 +20,18 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { ProfileForm } from "./profile-form";
 import { formSchema } from "../schema";
+import { useCurrentChatData } from "../atoms";
+import { useAtom } from "jotai";
 
 export default function UpdateProfile() {
   const { chats } = useParams();
   const chatId = Array.isArray(chats) ? chats[0] : chats;
 
+  // get profile data from focusedChatAtom to populate form
+  const focusedChatAtom = useCurrentChatData(chatId!);
+  const [focusedChatData, setFocusedChatData] = useAtom(focusedChatAtom);
+
+  // get profile data from server
   const { data } = api.chat.getChat.useQuery(
     chatId ? { chatId: chatId } : skipToken,
     {
@@ -48,19 +55,32 @@ export default function UpdateProfile() {
   });
 
   useEffect(() => {
+    if (focusedChatData) {
+      form.reset({
+        name: focusedChatData.chatData.name,
+        gender: focusedChatData.chatData.gender,
+        birthDate: focusedChatData.chatData.birthDate,
+        relationship: focusedChatData.chatData.relationship,
+        heartLevel: focusedChatData.chatData.heartLevel,
+        race: focusedChatData.chatData.race,
+        country: focusedChatData.chatData.country,
+        language: focusedChatData.chatData.language,
+      });
+    }
+
     if (data) {
       form.reset({
         name: data.name,
         gender: data.gender,
-        birthDate: data.birthDate?.toDateString(),
+        birthDate: data.birthDate ? new Date(data.birthDate).toISOString() : "",
         relationship: data.relationship,
         heartLevel: data.heartLevel,
-        race: data.race ?? "",
-        country: data.country ?? "",
-        language: data.language ?? "",
+        race: data.relationship,
+        country: data.country ?? undefined,
+        language: data.language,
       });
     }
-  }, [data, form]);
+  }, [focusedChatData, data, form]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     // Removes empty values and replaces them with undefined
@@ -70,6 +90,10 @@ export default function UpdateProfile() {
       ),
     ) as z.infer<typeof formSchema>;
 
+    // Update global state (focusedChatData) with edited profile
+    // setFocusedChatData(cleanedValues);
+
+    // Update database with edited profile
     updateChatMutation.mutate({
       chatId: chatId!,
       birthDate: values.birthDate

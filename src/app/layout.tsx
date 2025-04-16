@@ -9,7 +9,7 @@ import Home from "~/app/_components/global/home";
 
 import { SidebarProvider } from "@components/ui/sidebar";
 import { Toaster } from "sonner";
-import JotaiProvider from "./_components/global/jotai-provider";
+import JotaiProvider from "./_components/jotai-provider";
 
 export const metadata: Metadata = {
   title: "Wally",

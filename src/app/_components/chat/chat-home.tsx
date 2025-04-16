@@ -24,10 +24,25 @@ import UpdateProfile from "../profile/update-profile";
 import { useAtomValue } from "jotai";
 import { useCurrentChatData } from "../atoms";
 import { marked } from "marked";
+import { UIMessage } from "ai";
 
 interface Emotion {
   emotion: string;
   emoji: string;
+}
+
+interface MessagePart {
+  type:
+    | "text"
+    | "source"
+    | "reasoning"
+    | "tool-invocation"
+    | "file"
+    | "step-start";
+  text?: string;
+  source?: { url: string };
+  reasoning?: string;
+  toolInvocation?: { toolName: string };
 }
 
 const emotions: Emotion[] = [
@@ -48,7 +63,7 @@ export default function ChatHome() {
   const { chats } = useParams();
   const chatId = Array.isArray(chats) ? chats[0] : chats;
 
-  // get profile data from atom earlier and set UI
+  // get profile data from focusedChatDatAatom earlier and set UI
   const focusedChatData = useCurrentChatData(chatId!);
   const focusedChat = useAtomValue(focusedChatData);
   const chatData = focusedChat?.chatData;
@@ -57,22 +72,6 @@ export default function ChatHome() {
   const relationship = chatData?.relationship;
   const name = chatData?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
-
-  // handles getting profile data from the db and setting it in the UI
-  // const {
-  //   data: dataChat,
-  //   isLoading: isLoadingChat,
-  //   isSuccess: isSuccessChat,
-  // } = api.chat.getChat.useQuery(chatId ? { chatId: chatId } : skipToken, {
-  //   refetchOnWindowFocus: false,
-  //   refetchOnMount: false,
-  //   enabled: !!chatId,
-  // });
-
-  // const redHeartLevel = dataChat?.heartLevel;
-  // const relationship = dataChat?.relationship;
-  // const name = dataChat?.name;
-  // const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
 
   // handle openai api call
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -190,7 +189,7 @@ export default function ChatHome() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
       <div className="flex h-[10%] w-[70%] items-center justify-between space-x-2">
         <div className="flex">
-          {Array.from({ length: redHeartLevel! }).map((_, i) => (
+          {Array.from({ length: redHeartLevel }).map((_, i) => (
             <Heart key={i} className="text-red-500" />
           ))}
           {Array.from({ length: grayHeartLevel }).map((_, i) => (
@@ -214,30 +213,41 @@ export default function ChatHome() {
           help you today?
         </ChatMessage>
         {/* map each message in messages[] to a <ChatMessage> Component */}
-        {messages.map((message, index) =>
-          message.parts.map((part, i) => (
-            <ChatMessage key={`${index}-${i}`} isUser={message.role === "user"}>
-              {part.type === "text" && (
-                <div
-                  key={i}
-                  className="prose max-w-full"
-                  dangerouslySetInnerHTML={{ __html: marked(part.text) }}
-                />
-              )}
-              {part.type === "source" && (
-                <a key={i} href={part.source.url}>
-                  {part.source.url}
-                </a>
-              )}
-              {part.type === "reasoning" && <div key={i}>{part.reasoning}</div>}
-              {part.type === "tool-invocation" && (
-                <div key={i}>{part.toolInvocation.toolName}</div>
-              )}
-              {/* {part.type === "file" && (<img key={i} src={`data:${part.mimeType};base64,${part.data}`} />)} */}
-            </ChatMessage>
-          )),
-        )}
-        {status == "streaming" && <ChatMessage>...</ChatMessage>}
+        {messages.map((message, mi) => (
+          <ChatMessage key={mi} isUser={message.role === "user"}>
+            {message.parts.map((part, pi) => {
+              switch (part.type) {
+                case "text":
+                  return (
+                    <div
+                      key={pi}
+                      className="prose max-w-full"
+                      dangerouslySetInnerHTML={{
+                        __html: marked(part.text ?? ""),
+                      }}
+                    />
+                  );
+                case "source":
+                  return (
+                    <a key={pi} href={part.source.url}>
+                      {part.source.url}
+                    </a>
+                  );
+                case "reasoning":
+                  return <div key={pi}>{part.reasoning}</div>;
+                case "tool-invocation":
+                  return <div key={pi}>{part.toolInvocation.toolName}</div>;
+                case "file":
+                  return <div key={pi}>{part.data}</div>;
+                case "step-start":
+                  return null;
+                default:
+                  return null;
+              }
+            })}
+          </ChatMessage>
+        ))}
+        {/* {status == "streaming" && <ChatMessage>...</ChatMessage>} */}
       </ScrollArea>
       <div className="mx-auto w-[70%] min-w-[70%] p-4">
         <label htmlFor="newMessage" className="sr-only">
