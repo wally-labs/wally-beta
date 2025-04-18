@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, CircleArrowRight, StopCircle } from "lucide-react";
+import { Heart, CircleArrowRight, StopCircle, Upload } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
@@ -25,24 +25,11 @@ import { useAtomValue } from "jotai";
 import { useCurrentChatData } from "../atoms";
 import { marked } from "marked";
 import { UIMessage } from "ai";
+import { UploadButton } from "~/lib/uploadthing";
 
 interface Emotion {
   emotion: string;
   emoji: string;
-}
-
-interface MessagePart {
-  type:
-    | "text"
-    | "source"
-    | "reasoning"
-    | "tool-invocation"
-    | "file"
-    | "step-start";
-  text?: string;
-  source?: { url: string };
-  reasoning?: string;
-  toolInvocation?: { toolName: string };
 }
 
 const emotions: Emotion[] = [
@@ -186,7 +173,7 @@ export default function ChatHome() {
 
   return (
     // DIVIDE into components once ui is decided -> components take in heart level as input and return ui accordingly
-    <div className="flex min-h-screen flex-col items-center justify-center gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
+    <div className="flex min-h-[80vh] min-w-[70vw] flex-col items-center justify-center gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
       <div className="flex h-[10%] w-[70%] items-center justify-between space-x-2">
         <div className="flex">
           {Array.from({ length: redHeartLevel }).map((_, i) => (
@@ -206,12 +193,7 @@ export default function ChatHome() {
           <UpdateProfile />
         </div>
       </div>
-      <ScrollArea className="mx-auto flex h-[500px] w-[70%] min-w-[70%] flex-col space-y-2 overflow-y-auto rounded-md border pb-2">
-        {/* placeholder because the UI is not fixed yet */}
-        <ChatMessage>
-          Hello! I&apos;m Wally, your relationship wellness assistant. How can I
-          help you today?
-        </ChatMessage>
+      <ScrollArea className="mx-auto flex h-[500px] w-[70vw] min-w-[70vw] flex-col space-y-2 overflow-y-auto rounded-md border">
         {/* map each message in messages[] to a <ChatMessage> Component */}
         {messages.map((message, mi) => (
           <ChatMessage key={mi} isUser={message.role === "user"}>
@@ -249,7 +231,7 @@ export default function ChatHome() {
         ))}
         {/* {status == "streaming" && <ChatMessage>...</ChatMessage>} */}
       </ScrollArea>
-      <div className="mx-auto w-[70%] min-w-[70%] p-4">
+      <div className="mx-auto w-[70vw] min-w-[70vw] p-4">
         <label htmlFor="newMessage" className="sr-only">
           Send a Message
         </label>
@@ -273,30 +255,44 @@ export default function ChatHome() {
                 </Button>
               )}
               {status === "ready" && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="main">
-                      <CircleArrowRight className="text-lg" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuLabel>Emotions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {emotions.map((e) => {
-                      return (
-                        <DropdownMenuItem
-                          key={e.emotion}
-                          onClick={() => {
-                            handleEmotionSubmit(e.emotion);
-                          }}
-                        >
-                          {e.emotion}
-                          <span>{e.emoji}</span>
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                  <UploadButton
+                    className="ut-button:bg-amberTheme ut-button:ut-readying:bg-amberTheme/50"
+                    endpoint="imageUploader"
+                    onClientUploadComplete={(res) => {
+                      console.log("Files: ", res);
+                      toast.success("Image uploaded successfully");
+                    }}
+                    onUploadError={(error: Error) => {
+                      console.log("Error uploading image: ", error);
+                      toast.error("Error uploading image");
+                    }}
+                  />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="main">
+                        <CircleArrowRight className="w-[200px] text-2xl" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Emotions</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {emotions.map((e) => {
+                        return (
+                          <DropdownMenuItem
+                            key={e.emotion}
+                            onClick={() => {
+                              handleEmotionSubmit(e.emotion);
+                            }}
+                          >
+                            {e.emotion}
+                            <span>{e.emoji}</span>
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
               )}
             </div>
           </ShineBorder>

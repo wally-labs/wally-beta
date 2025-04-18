@@ -1,6 +1,7 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { auth } from "@clerk/nextjs/server";
+import { metadata } from "~/app/layout";
 
 const f = createUploadthing();
 
@@ -34,11 +35,35 @@ export const ourFileRouter = {
       // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete for userId:", metadata.userId);
 
-      console.log("file url", file.url);
+      console.log("file url", file.ufsUrl);
 
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-      return { uploadedBy: metadata.userId };
+      return { uploadedBy: metadata.userId, type: file.type };
     }),
+
+  // fileRouter: f({
+  //   // replace with file type
+  //   file: {
+  //     maxFileSize: "4MB",
+  //     maxFileCount: 1,
+  //   },
+  // })
+  //   .middleware(async ({ req }) => {
+  //     const user = await auth();
+
+  //     if (!user.userId) {
+  //       throw new Error(new UploadThingError("Unauthorized").toString());
+  //     }
+
+  //     return { userId: user.userId };
+  //   })
+  //   .onUploadComplete(async ({ metadata, file }) => {
+  //     console.log("Upload complete for userId:", metadata.userId);
+
+  //     console.log("file url", file.url);
+
+  //     return { uploadedBy: metadata.userId, type: file.type };
+  //   }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

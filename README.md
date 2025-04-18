@@ -16,17 +16,18 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] create update profile dialog box component
   - [x] create one form component to be used across create-profile and update-profile
   - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
-  - [ ] link user session to jotai state
+  - [ ] link user session to jotai state (currently using localStorage)
   - [ ] add image/pdf upload functionality (uploads from device/gdrive/dropbox)
   - [ ] updateProfile functionality (birthdate and heartLevel does not render default value)
   - [ ] update frontEnd to show 3 different dropdowns for responses
 
 - [ ] UI/UX
 
-  - [ ] fix create-chat page ui (languages greyed out)
+  - [ ] make sure ui for all pages is 100vh
+  - [ ] fix create-chat page ui (languages currently greyed out)
   - [ ] make sure scroll area in chat page sticks to the bottom
   - [ ] chat area has a down button to scroll down
-  - [ ] make ui mobile friendly (not for demo!)
+  - [ ] make ui mobile friendly
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
 
@@ -89,9 +90,10 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] store all chatHeader data (everyth except messages)
   - [x] use atomic state for chatHome page
   - [x] sort (according to updatedAt) before displaying chatData on frontend
-  - [x] update profile -> updates focusedChatData atom
-  - [x] delete profile -> removes ref to focusedChatData atom
-  - [x] user sends message -> update updatedAt of focusedChatData atom
+  - [x] useEffect in app sidebar handles all:
+    - [x] update profile -> updates focusedChatData atom (useEffect in app-sidebar)
+    - [x] delete profile -> removes ref to focusedChatData atom
+    - [x] user sends message -> update updatedAt of focusedChatData atom
 
 - [ ] separate dbs for production and dev (w/ vercel - paid, not for demo)
 - [ ] check auth caching state (not for demo?)
