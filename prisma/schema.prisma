@@ -98,14 +98,18 @@ enum Sender {
 }
 
 model Messages {
-    id        String   @id @default(cuid())
-    chatId    String
-    content   String
-    vectorKey String?   @unique // reference to pinecone db vector key
-    messageBy Sender
+    id          String     @id @default(cuid())
+    chatId      String
+    content     String
+    vectorKey   String?    @unique // reference to pinecone db vector key
+    messageBy   Sender
 
-    createdAt DateTime @default(now())
-    chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+    // stores all generated messages, # user messages == 1, # wally messages >= 1
+    allMessages String[]   @default([])
+    imageUrl    String?
+
+    createdAt   DateTime   @default(now())
+    chat        Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
     @@index([chatId])
 }

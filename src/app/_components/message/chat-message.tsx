@@ -17,7 +17,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         isUser ? "flex-row-reverse" : "flex-row"
       }`}
     >
-      {!isUser && <UserCircle2 className="h-8 w-8" />}
+      {/* Replace with Wally Avatar, once ready */}
+      {!isUser && <UserCircle2 className="h-8 min-h-8 w-8 min-w-8" />}
       <div
         className={`rounded-lg p-3 text-gray-600 ${
           isUser

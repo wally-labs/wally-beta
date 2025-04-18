@@ -17,8 +17,11 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] create one form component to be used across create-profile and update-profile
   - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
   - [ ] link user session to jotai state (currently using localStorage)
-  - [ ] add image/pdf upload functionality (uploads from device/gdrive/dropbox)
-  - [ ] updateProfile functionality (birthdate and heartLevel does not render default value)
+  - [x] add image/pdf upload functionality (uploads from device)
+    - [ ] display file selected on the frontend
+    - [ ] figure out how to delete file from frontend
+  - [ ] add image/pdf upload functionality (uploads from drive/dropbox etc.)
+  - [ ] updateProfile display (birthdate and heartLevel does not render default value)
   - [ ] update frontEnd to show 3 different dropdowns for responses
 
 - [ ] UI/UX
@@ -31,6 +34,11 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
 
 - [x] correct client side auth errors (import session from clerk not next-auth)
 
+- [ ] DB
+
+  - [x] update schema to hold messages array + correct message
+  - [x] update schema to hold imageUrl?
+
 - [ ] auth + trpc
 
   - [x] fix login page ui (just styling)
@@ -41,7 +49,11 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] procedure to update chats's updatedAt (arrange chats by updatedAt, not createdAt)
   - [ ] convert all restricted value fields to enums
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
-  - [ ] convert to personal providers for auth
+  - [ ] convert to personal providers for auth, before launch
+  - [ ] procedure to add allMessages array to db, use current message route for correct message only
+  - [ ] procedure to send imageUrl from frontend to db upon fileUpload completion
+  - [ ] procedure to delete imageUrl from db, if frontend user deletes
+  - [ ] rate limits to each user on number of api calls (per month/day..)
 
 - [x] profile
 
@@ -57,7 +69,8 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] figure out best routing conventions
   - [x] route createChat to new page with the chat once complete
   - [x] create chat scrollbox
-  - [ ] chat headers route only called once during login, or after create-chat invocation (not for demo)
+  - [ ] chat headers only called if user is logged in
+  - [ ] chat headers route only called once during login, or after create-chat invocation
 
 - [ ] openAI API (text-to-text)
 
@@ -68,19 +81,20 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] queries messages are added to the Messages object to send to OpenAI
   - [x] add function to stop request, and retry on error
   - [x] structure response object so that we can personalize output
+  - [ ] able to send image/pdf upload capabilities
   - [ ] implement RAG (data flow issues) + Pinecone
   - [ ] indiv pinecone namespace for each user -> id prefixes for each profile
   - [ ] return multiple responses before beta release (completion.choices[0,1,2..]?)
   - [ ] add error handling, cancelling & regeneration to UI using vercel SDK
   - [x] optimize speed and payload size
   - [ ] add context window library and tokenizer, figure out embedding
-  - [ ] able to send image/pdf upload capabilities
 
 ### OPTIMIZATION
 
-- [ ] optimize "use client" boundaries to for less CSR
+- [ ] optimize "use client" boundaries for less CSR
 - [ ] optimization testing (w/ react-scan)
 
+  - [ ] extract out entire chat-home.tsx (and similar pages) to reduce csr
   - [ ] minimize rerenders
   - [ ] use different types of queries
   - [ ] try abort controller
@@ -95,16 +109,17 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
     - [x] delete profile -> removes ref to focusedChatData atom
     - [x] user sends message -> update updatedAt of focusedChatData atom
 
-- [ ] separate dbs for production and dev (w/ vercel - paid, not for demo)
-- [ ] check auth caching state (not for demo?)
-- [ ] error logging (w/ axiom - paid) (not for demo)
+- [ ] separate dbs for production and dev
+- [ ] check auth caching state (not for demo)
+- [ ] error logging (w/ axiom - paid)
 - [ ] error management (w/ sentry)
 - [ ] routing pages (parallel routes)
 - [ ] set up analytics (w/ posthog maybe highlight?)
-- [ ] payment processing + webhooks (w/ stripe)
 - [ ] language option (expand wally ai to be able to give answers in different languages)
 
 ### POST-PRODUCTION
 
+- [ ] payment processing + webhooks (w/ stripe)
+- [ ] update user scheme (paid vs free user)
 - [ ] migrate from pinecone db to milvus once we start to scale
 - [ ] migrate from vercel hosting to ...

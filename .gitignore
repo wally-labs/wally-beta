@@ -50,3 +50,4 @@ clerk_users.json
 clerk_transformed_users.json
 clerk_transform.js
 clerk_seed.js
+misc/

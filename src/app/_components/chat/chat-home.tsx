@@ -24,8 +24,8 @@ import UpdateProfile from "../profile/update-profile";
 import { useAtomValue } from "jotai";
 import { useCurrentChatData } from "../atoms";
 import { marked } from "marked";
-import { UIMessage } from "ai";
-import { UploadButton } from "~/lib/uploadthing";
+import { UploadDropzone } from "~/lib/uploadthing";
+import { OurFileRouter } from "~/app/api/uploadthing/core";
 
 interface Emotion {
   emotion: string;
@@ -46,6 +46,8 @@ const emotions: Emotion[] = [
 ];
 
 export default function ChatHome() {
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+
   // object has the same name as the slug in the URL
   const { chats } = useParams();
   const chatId = Array.isArray(chats) ? chats[0] : chats;
@@ -173,8 +175,8 @@ export default function ChatHome() {
 
   return (
     // DIVIDE into components once ui is decided -> components take in heart level as input and return ui accordingly
-    <div className="flex min-h-[80vh] min-w-[70vw] flex-col items-center justify-center gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
-      <div className="flex h-[10%] w-[70%] items-center justify-between space-x-2">
+    <div className="flex min-h-[80vh] min-w-[65vw] flex-col items-center justify-center gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
+      <div className="flex h-[10%] w-[80%] items-center justify-between space-x-2">
         <div className="flex">
           {Array.from({ length: redHeartLevel }).map((_, i) => (
             <Heart key={i} className="text-red-500" />
@@ -193,7 +195,7 @@ export default function ChatHome() {
           <UpdateProfile />
         </div>
       </div>
-      <ScrollArea className="mx-auto flex h-[500px] w-[70vw] min-w-[70vw] flex-col space-y-2 overflow-y-auto rounded-md border">
+      <ScrollArea className="mx-auto flex h-[500px] w-[65vw] min-w-[65vw] flex-col space-y-2 overflow-y-auto rounded-md border">
         {/* map each message in messages[] to a <ChatMessage> Component */}
         {messages.map((message, mi) => (
           <ChatMessage key={mi} isUser={message.role === "user"}>
@@ -231,11 +233,29 @@ export default function ChatHome() {
         ))}
         {/* {status == "streaming" && <ChatMessage>...</ChatMessage>} */}
       </ScrollArea>
-      <div className="mx-auto w-[70vw] min-w-[70vw] p-4">
+      <div className="mx-auto flex w-[65vw] flex-col gap-0">
+        <UploadDropzone
+          className="ut-allowed-content:hidden ut-label:text-amberTheme ut-uploading:ut-label:text-amberTheme-darker relative m-0 max-h-[30px] w-full overflow-visible rounded-b-none border-b-0 bg-gray-100/50 p-0"
+          endpoint="imageUploader"
+          config={{
+            mode: "auto",
+          }}
+          onClientUploadComplete={(res) => {
+            // Do something with the response
+            console.log("File: ", res);
+            setImageUrl(res[0]?.ufsUrl);
+            toast.success("Image uploaded successfully");
+          }}
+          onUploadError={(error: Error) => {
+            // Do something with the error
+            console.log("Error uploading image: ", error);
+            toast.error("Error uploading image");
+          }}
+        />
         <label htmlFor="newMessage" className="sr-only">
           Send a Message
         </label>
-        <div className="flex items-center overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+        <div className="flex items-center overflow-hidden rounded-b-lg rounded-t-none border border-t-0 border-gray-200 shadow-sm">
           <ShineBorder
             className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border bg-background md:shadow-xl"
             color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
@@ -256,8 +276,8 @@ export default function ChatHome() {
               )}
               {status === "ready" && (
                 <>
-                  <UploadButton
-                    className="ut-button:bg-amberTheme ut-button:ut-readying:bg-amberTheme/50"
+                  {/* <UploadButton
+                    className="ut-button:bg-amberTheme ut-button:ut-readying:bg-amberTheme/50 ut-button:ut-uploading:bg-amberTheme/50"
                     endpoint="imageUploader"
                     onClientUploadComplete={(res) => {
                       console.log("Files: ", res);
@@ -267,11 +287,11 @@ export default function ChatHome() {
                       console.log("Error uploading image: ", error);
                       toast.error("Error uploading image");
                     }}
-                  />
+                  /> */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="main">
-                        <CircleArrowRight className="w-[200px] text-2xl" />
+                      <Button variant="main" className="text-md h-11">
+                        Send
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
