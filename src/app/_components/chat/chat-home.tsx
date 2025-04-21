@@ -155,6 +155,7 @@ export default function ChatHome() {
           ? (msg.files as Attachment[])
           : undefined,
       }));
+
       setMessages(queriedMessages);
     }
   }, [dataMessages, setMessages]);
@@ -246,6 +247,7 @@ export default function ChatHome() {
                 // case "file":
                 //   return <div key={pi}>{part.data}</div>;
                 case "file": {
+                  console.log("we are here!", part);
                   const url = part.data;
                   const isImg = /\.(jpe?g|png|gif|webp)$/i.test(url);
                   return isImg ? (

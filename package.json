@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.1.12",
-    "@ai-sdk/react": "^1.1.16",
+    "@ai-sdk/react": "^1.2.9",
     "@auth/prisma-adapter": "^2.7.2",
     "@clerk/nextjs": "^6.9.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
