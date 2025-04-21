@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, CircleArrowRight, StopCircle } from "lucide-react";
+import { Heart, CircleArrowRight, StopCircle, ImageIcon } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
@@ -222,60 +222,25 @@ export default function ChatHome() {
         {/* map each message in messages[] to a <ChatMessage> Component */}
         {messages.map((message, mi) => (
           <ChatMessage key={mi} isUser={message.role === "user"}>
-            {message.parts.map((part, pi) => {
-              switch (part.type) {
-                case "text":
-                  return (
-                    <div
-                      key={pi}
-                      className="prose max-w-full"
-                      dangerouslySetInnerHTML={{
-                        __html: marked(part.text ?? ""),
-                      }}
-                    />
-                  );
-                case "source":
-                  return (
-                    <a key={pi} href={part.source.url}>
-                      {part.source.url}
-                    </a>
-                  );
-                case "reasoning":
-                  return <div key={pi}>{part.reasoning}</div>;
-                case "tool-invocation":
-                  return <div key={pi}>{part.toolInvocation.toolName}</div>;
-                // case "file":
-                //   return <div key={pi}>{part.data}</div>;
-                case "file": {
-                  console.log("we are here!", part);
-                  const url = part.data;
-                  const isImg = /\.(jpe?g|png|gif|webp)$/i.test(url);
-                  return isImg ? (
-                    <Image
-                      key={pi}
-                      src={url}
-                      width={300}
-                      height={300}
-                      alt="attachment"
-                      className="max-w-full rounded-md"
-                    />
-                  ) : (
-                    <Link
-                      key={pi}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Download file
-                    </Link>
-                  );
-                }
-                case "step-start":
-                  return null;
-                default:
-                  return null;
-              }
-            })}
+            {message.experimental_attachments
+              ?.filter((att) => att.contentType?.startsWith("image/"))
+              .map((att, ai) => (
+                <Image
+                  key={`${mi}-${ai}`}
+                  src={att.url}
+                  alt={att?.name ?? "image"}
+                  width={300}
+                  height={300}
+                  className="rounded-lg"
+                />
+              ))}
+            <div
+              key={mi}
+              className="prose max-w-full"
+              dangerouslySetInnerHTML={{
+                __html: marked(message.content ?? ""),
+              }}
+            ></div>
           </ChatMessage>
         ))}
         {/* {status == "streaming" && <ChatMessage>...</ChatMessage>} */}

@@ -76,77 +76,84 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
   - [x] create update profile dialog box component
   - [x] create one form component to be used across create-profile and update-profile
   - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
-  - [ ] link user session to jotai state (currently using localStorage)
+  - [ ] link user(?) session to jotai state (currently using localStorage)
   - [x] add image/pdf upload functionality (uploads from device)
-    - [ ] display file selected (if image) on frontend
+    - [x] display file selected (if image) on frontend
     - [ ] display file selected in dropzone
     - [ ] figure out how to delete file from frontend
-  - [ ] add image/pdf upload functionality (uploads from drive/dropbox etc.)
-  - [ ] updateProfile display (birthdate and heartLevel does not render default value)
+  - [ ] add image/pdf upload functionality (from drive/dropbox etc.)
   - [ ] update frontEnd to show 3 different dropdowns for responses
+  - [ ] updateProfile display (birthdate and heartLevel does not render default value)
   - [ ] display currently selected emotion on frontend
 
 - [ ] UI/UX
 
-  - [ ] make sure ui for all pages is 100vh
+  - [ ] make sure ui for all pages is exactly 100vh
   - [ ] fix create-chat page ui (languages currently greyed out)
   - [ ] make sure scroll area in chat page sticks to the bottom
   - [ ] chat area has a down button to scroll down
-  - [ ] make ui mobile friendly
+  - [ ] make ui mobile friendly (mainly sidebar)
 
-- [x] correct client side auth errors (import session from clerk not next-auth)
+<details>
+  <summary><string>DB</strong></summary>
 
-- [ ] DB
+- [x] create schema for necessary wally components
+- [x] update schema to hold messages array + correct message
+- [x] update schema to hold file[]
+- [x] create file model for OpenAI Attachments
 
-  - [x] update schema to hold messages array + correct message
-  - [x] update schema to hold imageUrl?
+</details>
 
 - [ ] auth + trpc
 
   - [x] fix login page ui (just styling)
+  - [x] correct client side auth errors (import session from clerk not next-auth)
   - [x] remove user id input from all routes use id from ctx.session
   - [x] seed current users into vercel db
-  - [x] user with no plan is rerouted to "/plans" page when navigating to 'new chat'
+  - [x] user with no plan is rerouted to "/plans" page when navigating to '/create-chat'
   - [x] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
   - [x] procedure to update chats's updatedAt (arrange chats by updatedAt, not createdAt)
+  - [x] save message to db (including files, optional)
   - [ ] convert all restricted value fields to enums
   - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
   - [ ] convert to personal providers for auth, before launch
   - [ ] procedure to add allMessages array to db, use current message route for correct message only
-  - [ ] procedure to send imageUrl from frontend to db upon fileUpload completion
-  - [ ] procedure to delete imageUrl from db, if frontend user deletes
   - [ ] rate limits to each user on number of api calls (per month/day..)
 
-- [x] profile
+<details>
+  <summary><strong>profile</strong></summary>
 
-  - [x] customised user settings page (optional)
-  - [x] chat/profile configuration button and popup
-  - [x] route to new chat page when profile is created
-  - [x] create updateProfile route, only updates necessary info
-  - [x] delete chat functionality + add to frontend
+- [x] customised user settings page (optional)
+- [x] chat/profile configuration button and popup
+- [x] route to new chat page when profile is created
+- [x] create updateProfile route, only updates necessary info
+- [x] delete chat functionality + add to frontend
 
-- [ ] homepage + chat headers
+</details>
 
-  - [x] test chatHeaders routes
-  - [x] figure out best routing conventions
-  - [x] route createChat to new page with the chat once complete
-  - [x] create chat scrollbox
-  - [ ] chat headers only called if user is logged in
-  - [ ] chat headers route only called once during login, or after create-chat invocation
+<details>
+  <summary><strong>homepage + chat headers</strong></summary>
+
+- [x] test chatHeaders routes
+- [x] figure out best routing conventions
+- [x] route createChat to new page with the chat once complete
+- [x] create chat scrollbox
+
+</details>
 
 - [ ] openAI API (text-to-text)
 
-  - [x] system prompt optimization (can be improved)
+  - [x] system prompt optimization (can still be improved)
   - [x] write sendMessage route
   - [x] test sendMessage call to openAI and check response
   - [x] stream ai responses
   - [x] queries messages are added to the Messages object to send to OpenAI
   - [x] add function to stop request, and retry on error
   - [x] structure response object so that we can personalize output
-  - [ ] able to send image/pdf upload capabilities
+  - [x] able to send image/pdf upload capabilities
   - [ ] implement RAG (data flow issues) + Pinecone
   - [ ] indiv pinecone namespace for each user -> id prefixes for each profile
-  - [ ] return multiple responses before beta release (completion.choices[0,1,2..]?)
+  - [ ] return multiple responses to user before beta release
   - [ ] add error handling, cancelling & regeneration to UI using vercel SDK
   - [x] optimize speed and payload size
   - [ ] add context window library and tokenizer, figure out embedding
@@ -157,9 +164,11 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [ ] optimization testing (w/ react-scan)
 
   - [ ] extract out entire chat-home.tsx (and similar pages) to reduce csr
+  - [ ] improve page load times
+  - [ ] add interactivity to page (make use of suspense boundaries/loading.tsx)
   - [ ] minimize rerenders
   - [ ] use different types of queries
-  - [ ] try abort controller
+  - [ ] try using abort controller
 
 - [x] integrate global state management - jotai (atomic state)
 
@@ -182,6 +191,6 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 ### POST-PRODUCTION
 
 - [ ] payment processing + webhooks (w/ stripe)
-- [ ] update user scheme (paid vs free user)
+- [ ] update user schema (paid vs free user)
 - [ ] migrate from pinecone db to milvus once we start to scale
 - [ ] migrate from vercel hosting to ...
