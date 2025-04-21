@@ -90,7 +90,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 
   - [ ] make sure ui for all pages is exactly 100vh
   - [ ] fix create-chat page ui (languages currently greyed out)
-  - [ ] make sure scroll area in chat page sticks to the bottom
+  - [x] make sure scroll area in chat page sticks to the bottom
   - [ ] chat area has a down button to scroll down
   - [ ] make ui mobile friendly (mainly sidebar)
 
@@ -119,6 +119,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
   - [ ] convert to personal providers for auth, before launch
   - [ ] procedure to add allMessages array to db, use current message route for correct message only
   - [ ] rate limits to each user on number of api calls (per month/day..)
+  - [ ] use httpbatchstreamlink
 
 <details>
   <summary><strong>profile</strong></summary>
@@ -163,6 +164,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [ ] optimize "use client" boundaries for less CSR
 - [ ] optimization testing (w/ react-scan)
 
+  - [ ] hook up debugger and record trace/flamegraph with added performance tracing calls
   - [ ] extract out entire chat-home.tsx (and similar pages) to reduce csr
   - [ ] improve page load times
   - [ ] add interactivity to page (make use of suspense boundaries/loading.tsx)

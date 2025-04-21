@@ -47,6 +47,9 @@ const emotions: Emotion[] = [
 ];
 
 export default function ChatHome() {
+  // ref object to scroll to the bottom of the chat
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   // ref object to store the uploaded file, only until file is used for a message
   const wallyFileRef = useRef<Attachment | null>(null);
 
@@ -139,6 +142,11 @@ export default function ChatHome() {
     },
   });
 
+  // scroll to the bottom of the chat when messages change
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [scrollRef, messages]);
+
   // use setMessage to set queried messages into data to be sent to the openai api
   useEffect(() => {
     if (dataMessages) {
@@ -193,7 +201,7 @@ export default function ChatHome() {
 
   return (
     // DIVIDE into components once ui is decided -> components take in heart level as input and return ui accordingly
-    <div className="flex min-h-[80vh] min-w-[65vw] flex-col items-center justify-center gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
+    <div className="flex min-h-[80vh] min-w-[65vw] flex-col items-center justify-between gap-10 bg-gradient-to-b from-[white] to-[#f7faff] py-12 text-black">
       <div className="flex h-[10%] w-[80%] items-center justify-between space-x-2">
         <div className="flex">
           {Array.from({ length: redHeartLevel }).map((_, i) => (
@@ -236,6 +244,7 @@ export default function ChatHome() {
                 __html: marked(message.content ?? ""),
               }}
             ></div>
+            <div ref={scrollRef} />
           </ChatMessage>
         ))}
         {/* {status == "streaming" && <ChatMessage>...</ChatMessage>} */}
