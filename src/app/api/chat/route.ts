@@ -1,15 +1,10 @@
 import "server-only";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import z from "zod";
+import type z from "zod";
 import { type formSchema } from "~/app/_components/schema";
 import { openai } from "@ai-sdk/openai";
-import {
-  type LanguageModelV1,
-  // streamObject,
-  streamText,
-  type UIMessage,
-} from "ai";
+import { smoothStream, streamText } from "ai";
+import type { LanguageModelV1, UIMessage, TextStreamPart, ToolSet } from "ai";
 import { type NextRequest } from "next/server";
 // import { type IncomingMessage, type ServerResponse } from "http";
 
@@ -22,6 +17,45 @@ import { type NextRequest } from "next/server";
 // const openAiSchema = z.object({
 //   elements: openAiElement.array(),
 // });
+
+// smooth streaming for chinese characters
+const chineseSplitter = smoothStream({
+  chunking: /[\u4E00-\u9FFF]|\S+\s+/,
+});
+
+// wrap chineseSplitter in custom stream
+const mixedLangTransform = () => {
+  // create the smooth‐stream instance
+  const transformer = chineseSplitter({ tools: {} });
+  const { readable, writable } = transformer;
+
+  return new TransformStream<TextStreamPart<ToolSet>, TextStreamPart<ToolSet>>({
+    async transform(part, controller) {
+      const text = part.type ?? "";
+      if (/[\u4E00-\u9FFF]/.test(text)) {
+        // send through chinese splitter writable
+        const writer = writable.getWriter();
+        await writer.write(part);
+        writer.releaseLock();
+
+        // pull smoothed chunks from the readable stream
+        const reader = readable.getReader();
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+          }
+        } finally {
+          reader.releaseLock();
+        }
+      } else {
+        // english or non‐chinese chunks: emit immediately
+        controller.enqueue(part);
+      }
+    },
+  });
+};
 
 export async function POST(req: NextRequest) {
   const model: LanguageModelV1 = openai(
@@ -100,6 +134,7 @@ export async function POST(req: NextRequest) {
       },
       ...messages,
     ],
+    experimental_transform: mixedLangTransform,
   });
 
   return result.toDataStreamResponse({

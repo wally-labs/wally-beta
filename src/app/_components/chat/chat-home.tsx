@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, CircleArrowRight, StopCircle, ImageIcon } from "lucide-react";
+import { Heart, StopCircle } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
@@ -25,9 +25,8 @@ import { useAtomValue } from "jotai";
 import { useCurrentChatData } from "../atoms";
 import { marked } from "marked";
 import { UploadDropzone } from "~/lib/uploadthing";
-import { type Attachment, smoothStream } from "ai";
+import type { Attachment } from "ai";
 import Image from "next/image";
-import Link from "next/link";
 
 interface Emotion {
   emotion: string;
@@ -108,10 +107,6 @@ export default function ChatHome() {
       chatId: chatId,
       // profileData: dataChat,
       profileData: chatData,
-    }),
-    // smooth streaming chinese text
-    experimental_transform: smoothStream({
-      chunking: /[\u4E00-\u9FFF]|\S+\s+/,
     }),
     onFinish: (assistantMessage, { usage, finishReason }) => {
       // for logging and debugging purposes
