@@ -1,6 +1,66 @@
 # Wally
 
-Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. Wally provides contextual responses tailored towards Singlish & Chinese users. Check out our MVP at the release link below!
+Wally is a relationship‑wellness companion designed to strengthen offline communication skills through tailored prompts, reflective exercises, and empathetic guidance. It adopts a Singlish‑flavored English style to make interactions feel natural and engaging for its users. Currently Wally is finetuned to provide responses tailored to English (Singlish) & Chinese speakers.
+
+## Why use Wally?
+
+Wally helps couples, friends, or colleagues engage in meaningful offline conversations by providing generated prompts, recommendations, and reflective questions. Its therapist‑style guidance is backed by a fine‑tuned language model that offers supportive feedback without judgment. Users can track their chat history, customize the app’s tone (including Singlish options), and upload relevant media for context. Streamlined with a modern React/Next.js frontend and AI pipeline, Wally is designed for both simplicity and depth in fostering better communication.
+
+## Tech Stack
+
+- **Framework & Language**
+
+  - Next.js (App Router)
+  - React
+  - TypeScript
+
+- **Styling & UI**
+
+  - Tailwind CSS
+  - Radix UI (headless components)
+  - Shadcn/ui (component library)
+
+- **Authentication & Sessions**
+
+  - Clerk (with Prisma adapter)
+
+- **State Management**
+
+  - Jotai (atomic state)
+
+- **Data Fetching & API**
+
+  - tRPC (type‑safe RPC)
+  - @tanstack/react-query
+
+- **AI Orchestration**
+
+  - OpenAI API (fine‑tuned models)
+  - Deepseek API
+
+- **Database**
+
+  - PostgreSQL (local via `start-database.sh`)
+  - Prisma ORM (schema, migrations, seeding)
+
+- **Retrieval & Embeddings**
+
+  - Pinecone (vector search / RAG)
+  - Milvus
+
+- **File Uploads & Media**
+
+  - Uploadthing (images & PDF uploads)
+  - Custom upload/display/delete components
+
+- **Validation & Utilities**
+
+  - Zod (schema validation)
+
+- **Observability & Payments**
+
+  - Sentry / Axiom (error logging)
+  - Stripe (plans & webhooks)
 
 ## TO-DO LIST
 
@@ -18,11 +78,13 @@ Wally is a relationship wellness chatbot powered by a fine-tuned openAI model. W
   - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
   - [ ] link user session to jotai state (currently using localStorage)
   - [x] add image/pdf upload functionality (uploads from device)
-    - [ ] display file selected on the frontend
+    - [ ] display file selected (if image) on frontend
+    - [ ] display file selected in dropzone
     - [ ] figure out how to delete file from frontend
   - [ ] add image/pdf upload functionality (uploads from drive/dropbox etc.)
   - [ ] updateProfile display (birthdate and heartLevel does not render default value)
   - [ ] update frontEnd to show 3 different dropdowns for responses
+  - [ ] display currently selected emotion on frontend
 
 - [ ] UI/UX
 

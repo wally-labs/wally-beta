@@ -77,7 +77,7 @@ model Chat {
     updatedAt    DateTime  @updatedAt
 
     user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    messages     Messages[]
+    messages     Message[]
 
     // profile fields
     name         String
@@ -97,19 +97,31 @@ enum Sender {
     WALLY
 }
 
-model Messages {
-    id          String     @id @default(cuid())
+model Message {
+    id          String        @id @default(cuid())
     chatId      String
     content     String
-    vectorKey   String?    @unique // reference to pinecone db vector key
+    vectorKey   String?       @unique // reference to pinecone db vector key
     messageBy   Sender
 
     // stores all generated messages, # user messages == 1, # wally messages >= 1
-    allMessages String[]   @default([])
-    imageUrl    String?
+    allMessages String[]      @default([])
+    files       Attachment[]
 
-    createdAt   DateTime   @default(now())
-    chat        Chat       @relation(fields: [chatId], references: [id], onDelete: Cascade)
+    createdAt   DateTime      @default(now())
+    chat        Chat          @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
     @@index([chatId])
+}
+
+model Attachment {
+    id           String  @id @default(cuid())
+    messageId    String
+    name         String?
+    contentType  String?
+    url          String
+
+    message      Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+    @@index([messageId])
 }

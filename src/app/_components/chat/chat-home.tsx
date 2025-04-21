@@ -1,13 +1,13 @@
 "use client";
 
-import { Heart, CircleArrowRight, StopCircle, Upload } from "lucide-react";
+import { Heart, CircleArrowRight, StopCircle } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { skipToken } from "@tanstack/react-query";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { useChat, type Message } from "@ai-sdk/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ShineBorder from "@components/ui/shine-border";
 import {
   DropdownMenu,
@@ -25,7 +25,9 @@ import { useAtomValue } from "jotai";
 import { useCurrentChatData } from "../atoms";
 import { marked } from "marked";
 import { UploadDropzone } from "~/lib/uploadthing";
-import { OurFileRouter } from "~/app/api/uploadthing/core";
+import { type Attachment, smoothStream } from "ai";
+import Image from "next/image";
+import Link from "next/link";
 
 interface Emotion {
   emotion: string;
@@ -46,7 +48,8 @@ const emotions: Emotion[] = [
 ];
 
 export default function ChatHome() {
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  // ref object to store the uploaded file, only until file is used for a message
+  const wallyFileRef = useRef<Attachment | null>(null);
 
   // object has the same name as the slug in the URL
   const { chats } = useParams();
@@ -62,9 +65,20 @@ export default function ChatHome() {
   const name = chatData?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
 
-  // handle openai api call
+  // set state of the currently selected emotion (useState to display on frontend in future)
   const [selectedEmotion, setSelectedEmotion] = useState("");
+  // handle openai api call
   const [shouldSubmit, setShouldSubmit] = useState(false);
+
+  // saveMessageMutation
+  const saveMessageMutation = api.messages.saveMessage.useMutation({
+    onSuccess: () => {
+      console.log("Message saved to db successfully");
+    },
+    onError: (error) => {
+      console.error("Error saving message: ", error);
+    },
+  });
 
   // handle getting all previous messages from the db
   const { data: dataMessages } = api.messages.getChatMessages.useQuery(
@@ -94,6 +108,10 @@ export default function ChatHome() {
       chatId: chatId,
       // profileData: dataChat,
       profileData: chatData,
+    }),
+    // smooth streaming chinese text
+    experimental_transform: smoothStream({
+      chunking: /[\u4E00-\u9FFF]|\S+\s+/,
     }),
     onFinish: (assistantMessage, { usage, finishReason }) => {
       // for logging and debugging purposes
@@ -129,24 +147,17 @@ export default function ChatHome() {
   // use setMessage to set queried messages into data to be sent to the openai api
   useEffect(() => {
     if (dataMessages) {
-      const queriedMessages: Message[] = dataMessages.map((message) => ({
-        id: message.id,
-        content: message.content,
-        role: message.messageBy === "USER" ? "user" : "assistant",
+      const queriedMessages: Message[] = dataMessages.map((msg) => ({
+        id: msg.id,
+        content: msg.content,
+        role: msg.messageBy === "USER" ? "user" : "assistant",
+        experimental_attachments: msg.files.length
+          ? (msg.files as Attachment[])
+          : undefined,
       }));
       setMessages(queriedMessages);
     }
   }, [dataMessages, setMessages]);
-
-  // saveMessageMutation
-  const saveMessageMutation = api.messages.saveMessage.useMutation({
-    onSuccess: () => {
-      console.log("Message saved to db successfully");
-    },
-    onError: (error) => {
-      console.error("Error saving message: ", error);
-    },
-  });
 
   // handles selecting an emotion from the dropdown menu, once emotion is set in state, should submit the message
   // once message is ready to be submitted, save that message to the db
@@ -158,17 +169,28 @@ export default function ChatHome() {
   // useEffect to handle submitting the message once shouldSubmit is set to true
   useEffect(() => {
     if (shouldSubmit && chatId && input) {
-      // try saving user message to db before calling handleSubmit()
       const userMessage = input;
+
+      // file to be saved to db if it exists
+      const file = wallyFileRef.current;
+
+      // try saving user message to db before calling handleSubmit()
       void saveMessageMutation.mutate({
         chatId: chatId,
         content: userMessage,
         messageBy: "USER",
+        files: file ? [file] : [],
       });
 
       console.log("Finished saving user message: ", userMessage);
 
-      handleSubmit();
+      // pass the file to the handleSubmit function
+      handleSubmit(undefined, {
+        experimental_attachments: file ? [file] : undefined,
+      });
+
+      // reset file ref and set shouldSubmit to false
+      wallyFileRef.current = null;
       setShouldSubmit(false);
     }
   }, [shouldSubmit, handleSubmit, chatId, input, saveMessageMutation]);
@@ -221,8 +243,31 @@ export default function ChatHome() {
                   return <div key={pi}>{part.reasoning}</div>;
                 case "tool-invocation":
                   return <div key={pi}>{part.toolInvocation.toolName}</div>;
-                case "file":
-                  return <div key={pi}>{part.data}</div>;
+                // case "file":
+                //   return <div key={pi}>{part.data}</div>;
+                case "file": {
+                  const url = part.data;
+                  const isImg = /\.(jpe?g|png|gif|webp)$/i.test(url);
+                  return isImg ? (
+                    <Image
+                      key={pi}
+                      src={url}
+                      width={300}
+                      height={300}
+                      alt="attachment"
+                      className="max-w-full rounded-md"
+                    />
+                  ) : (
+                    <Link
+                      key={pi}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Download file
+                    </Link>
+                  );
+                }
                 case "step-start":
                   return null;
                 default:
@@ -243,7 +288,14 @@ export default function ChatHome() {
           onClientUploadComplete={(res) => {
             // Do something with the response
             console.log("File: ", res);
-            setImageUrl(res[0]?.ufsUrl);
+            console.log("File URL: ", res[0]?.ufsUrl);
+            wallyFileRef.current = {
+              name: res[0]?.name ?? "",
+              url: res[0]?.ufsUrl ?? "",
+              contentType: res[0]?.type ?? "",
+            };
+            console.log("Image file wally: ", wallyFileRef.current);
+            console.log("Image url:", wallyFileRef.current?.url);
             toast.success("Image uploaded successfully");
           }}
           onUploadError={(error: Error) => {

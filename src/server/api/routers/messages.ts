@@ -4,8 +4,6 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const messagesRouter = createTRPCRouter({
-  // get messages from db ONCE when chat page opens up, get according to time and fill later
-  // not very sure how to do this tho...
   getChatMessages: protectedProcedure
     .input(
       z.object({
@@ -16,7 +14,7 @@ export const messagesRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       try {
         const { chatId, before } = input;
-        const messages = await ctx.db.messages.findMany({
+        const messages = await ctx.db.message.findMany({
           where: {
             chatId,
             createdAt: before ? { lt: new Date(before) } : undefined,
@@ -29,6 +27,13 @@ export const messagesRouter = createTRPCRouter({
             content: true,
             messageBy: true,
             createdAt: true,
+            files: {
+              select: {
+                name: true,
+                contentType: true,
+                url: true,
+              },
+            },
           },
         });
 
@@ -55,7 +60,7 @@ export const messagesRouter = createTRPCRouter({
           },
         });
 
-        const messages = await ctx.db.messages.findMany({
+        const messages = await ctx.db.message.findMany({
           where: {
             chatId: {
               in: chatIds.map((chat) => chat.id),
@@ -87,13 +92,22 @@ export const messagesRouter = createTRPCRouter({
         chatId: z.string(),
         content: z.string(),
         messageBy: z.enum(["USER", "WALLY"]),
+        files: z
+          .array(
+            z.object({
+              url: z.string(),
+              name: z.string().optional(),
+              contentType: z.string().optional(),
+            }),
+          )
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { chatId, content, messageBy } = input;
+      const { chatId, content, messageBy, files } = input;
 
       try {
-        // update chat with the chatId
+        // update chat's updatedAt with the chatId
         await ctx.db.chat.update({
           where: { id: chatId },
           data: {
@@ -101,11 +115,20 @@ export const messagesRouter = createTRPCRouter({
           },
         });
 
-        const message = await ctx.db.messages.create({
+        const message = await ctx.db.message.create({
           data: {
             chatId,
             content,
             messageBy,
+            allMessages: [content],
+            files: {
+              create:
+                files?.map((file) => ({
+                  url: file.url,
+                  name: file.name,
+                  contentType: file.contentType,
+                })) ?? [],
+            },
           },
         });
 

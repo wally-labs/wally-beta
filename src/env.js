@@ -18,6 +18,7 @@ export const env = createEnv({
     GOOGLE_SECRET: z.string().optional().nullable(),
     POSTGRES_URL: z.string().url(),
     PINECONE_API_KEY: z.string(),
+    OPENAI_API_KEY: z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -44,6 +45,7 @@ export const env = createEnv({
     GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET ?? undefined,
     POSTGRES_URL: process.env.POSTGRES_URL,
     PINECONE_API_KEY: process.env.PINECONE_API_KEY,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

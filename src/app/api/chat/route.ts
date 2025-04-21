@@ -90,8 +90,7 @@ export async function POST(req: NextRequest) {
   //   status: 200
   // });
 
-
-  // TRY STREAM TEXT
+  // STREAM TEXT
   const result = streamText({
     model: model,
     messages: [
@@ -99,10 +98,9 @@ export async function POST(req: NextRequest) {
         role: "system",
         content: systemPrompt + " " + contextPrompt + " " + emotionPrompt,
       },
-      ...messages
-    ]
-
-  })
+      ...messages,
+    ],
+  });
 
   return result.toDataStreamResponse({
     getErrorMessage: (error) => {
