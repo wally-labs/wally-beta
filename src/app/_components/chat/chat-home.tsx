@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, StopCircle } from "lucide-react";
+import { Aperture, Heart, StopCircle } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
@@ -82,7 +82,7 @@ export default function ChatHome() {
     },
   });
 
-  // handle getting all previous messages from the db
+  // handle getting all previous messages from the db (useQuery())
   const { data: dataMessages } = api.messages.getChatMessages.useQuery(
     chatId ? { chatId: chatId } : skipToken,
     {
@@ -91,6 +91,27 @@ export default function ChatHome() {
       enabled: !!chatId,
     },
   );
+
+  // try getting all previous messages from the db using a subscription (useSubscription())
+  // const { data: dataMessages } = api.messages.getChatMessages.useSubscription(
+  //   chatId ? { chatId: chatId } : skipToken,
+  //   {
+  //     onData: (msg) => {
+  //       setMessages((prevMsgs) => [
+  //         {
+  //           id: msg.id,
+  //           content: msg.content,
+  //           role: msg.messageBy === "USER" ? "user" : "assistant",
+  //           experimental_attachments: msg.files.length
+  //             ? (msg.files as Attachment[])
+  //             : undefined,
+  //         },
+  //         ...prevMsgs,
+  //       ]);
+  //       console.log("Received new message:", msg);
+  //     },
+  //   },
+  // );
 
   // useChat() hook sends a HTTP POST request to /api/chat endpoint
   const {
@@ -159,7 +180,7 @@ export default function ChatHome() {
           : undefined,
       }));
 
-      setMessages(queriedMessages);
+      setMessages(queriedMessages.reverse());
     }
   }, [dataMessages, setMessages]);
 

@@ -11,7 +11,7 @@ export const messagesRouter = createTRPCRouter({
         before: z.string().optional(),
       }),
     )
-    .query(async ({ ctx, input }) => {
+    .query(async function ({ ctx, input }) {
       try {
         const { chatId, before } = input;
         const messages = await ctx.db.message.findMany({
@@ -20,7 +20,7 @@ export const messagesRouter = createTRPCRouter({
             createdAt: before ? { lt: new Date(before) } : undefined,
           },
           orderBy: {
-            createdAt: "asc",
+            createdAt: "desc",
           },
           select: {
             id: true,
