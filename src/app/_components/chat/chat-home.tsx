@@ -1,12 +1,12 @@
 "use client";
 
-import { Aperture, Heart, StopCircle } from "lucide-react";
+import { Heart, StopCircle } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { skipToken } from "@tanstack/react-query";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { useChat, type Message } from "@ai-sdk/react";
+import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState } from "react";
 import ShineBorder from "@components/ui/shine-border";
 import {
@@ -25,7 +25,7 @@ import { useAtomValue } from "jotai";
 import { useCurrentChatData } from "../atoms";
 import { marked } from "marked";
 import { UploadDropzone } from "~/lib/uploadthing";
-import type { Attachment } from "ai";
+// import type { Attachment } from "ai";
 import Image from "next/image";
 
 interface Emotion {
@@ -45,6 +45,19 @@ const emotions: Emotion[] = [
   { emotion: "romantic", emoji: "🌹" },
   { emotion: "neutral", emoji: "😐" },
 ];
+
+type Attachment = {
+  name?: string;
+  contentType?: string;
+  url: string;
+};
+
+export type Message = {
+  id: string;
+  content: string;
+  role: "user" | "assistant";
+  experimental_attachments?: Attachment[];
+};
 
 export default function ChatHome() {
   // ref object to scroll to the bottom of the chat
@@ -92,89 +105,17 @@ export default function ChatHome() {
     },
   );
 
-  // try getting all previous messages from the db using a subscription (useSubscription())
-  // const { data: dataMessages } = api.messages.getChatMessages.useSubscription(
-  //   chatId ? { chatId: chatId } : skipToken,
-  //   {
-  //     onData: (msg) => {
-  //       setMessages((prevMsgs) => [
-  //         {
-  //           id: msg.id,
-  //           content: msg.content,
-  //           role: msg.messageBy === "USER" ? "user" : "assistant",
-  //           experimental_attachments: msg.files.length
-  //             ? (msg.files as Attachment[])
-  //             : undefined,
-  //         },
-  //         ...prevMsgs,
-  //       ]);
-  //       console.log("Received new message:", msg);
-  //     },
-  //   },
-  // );
+  // store all previous messages in state
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  // useChat() hook sends a HTTP POST request to /api/chat endpoint
-  const {
-    messages,
-    setMessages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    status,
-    stop,
-    reload,
-  } = useChat({
-    api: "/api/chat",
-    experimental_prepareRequestBody: ({ messages }) => ({
-      messages,
-      emotion: selectedEmotion,
-      chatId: chatId,
-      // profileData: dataChat,
-      profileData: chatData,
-    }),
-    onFinish: (assistantMessage, { usage, finishReason }) => {
-      // for logging and debugging purposes
-      // console.log("Finished streaming message:", assistantMessage);
-      console.log("Token usage:", usage);
-      console.log("Finish reason:", finishReason);
-
-      // try saving assistant message to db
-      try {
-        void saveMessageMutation.mutate({
-          chatId: chatId!,
-          content: assistantMessage.content,
-          messageBy: "WALLY",
-        });
-
-        console.log("Finished saving assistant message: ", assistantMessage);
-      } catch (error) {
-        console.error("Error saving assistant message:", error);
-      }
-    },
-    onResponse: (response) => {
-      console.log("Received HTTP response from server:", response);
-    },
-    onError: (error) => {
-      toast.error("An error occurred, ", {
-        description: error.name,
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        action: { label: "Retry", onClick: () => reload() },
-      });
-    },
-  });
-
-  // scroll to the bottom of the chat when messages change
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [scrollRef, messages]);
-
-  // use setMessage to set queried messages into data to be sent to the openai api
+  // set all messages once fetched from the db
   useEffect(() => {
     if (dataMessages) {
-      const queriedMessages: Message[] = dataMessages.map((msg) => ({
+      const queriedMessages = dataMessages.map((msg) => ({
         id: msg.id,
         content: msg.content,
-        role: msg.messageBy === "USER" ? "user" : "assistant",
+        role:
+          msg.messageBy === "USER" ? ("user" as const) : ("assistant" as const),
         experimental_attachments: msg.files.length
           ? (msg.files as Attachment[])
           : undefined,
@@ -182,7 +123,96 @@ export default function ChatHome() {
 
       setMessages(queriedMessages.reverse());
     }
-  }, [dataMessages, setMessages]);
+  }, [dataMessages]);
+
+  // stream messages from server
+  const [messageStreams, setMessageStreams] = useState([
+    { id: 0, chunks: [] as string[] },
+    { id: 1, chunks: [] as string[] },
+    { id: 2, chunks: [] as string[] },
+  ]);
+
+  // flag that checks if the stream is finished
+  const [streamDone, setStreamDone] = useState(false);
+
+  // SSE reader to split by choices.index
+  const startStream = () => {
+    const evtSrc = new EventSource("/api/chat", { withCredentials: true });
+
+    evtSrc.onmessage = (e) => {
+      if (e.data === "[DONE]") {
+        evtSrc.close();
+        setStreamDone(true);
+        return;
+      }
+      const payload = JSON.parse(e.data as string) as {
+        choices: { delta: { content?: string }; index: number }[];
+      };
+      for (const choice of payload.choices) {
+        if (!choice.delta.content) continue;
+        setMessageStreams((prev) =>
+          prev.map((s) =>
+            s.id === choice.index
+              ? { ...s, chunks: [...s.chunks, choice.delta.content!] }
+              : s,
+          ),
+        );
+      }
+    };
+    return () => evtSrc.close();
+  };
+
+  const handleSubmit = async (userInput: string) => {
+    if (!shouldSubmit) return;
+
+    const file = wallyFileRef.current;
+
+    // save user message to the db first
+    void saveMessageMutation.mutate({
+      chatId: chatId!,
+      content: userInput,
+      messageBy: "USER",
+      files: file ? [file] : [],
+    });
+
+    console.log({
+      messages: [
+        ...messages,
+        {
+          id: "random-for-now",
+          content: userInput,
+          role: "user" as const,
+          experimental_attachments: file ? [file] : undefined,
+        },
+      ],
+      emotion: selectedEmotion,
+      chatId, // shorthand for chatId: chatId
+      profileData: chatData,
+    });
+
+    await fetch("/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        messages: [
+          ...messages,
+          {
+            id: "random-for-now",
+            content: userInput,
+            role: "user",
+            experimental_attachments: file ? [file] : undefined,
+          },
+        ],
+        emotion: selectedEmotion,
+        chatId: chatId,
+        profileData: chatData,
+      }),
+    });
+
+    startStream();
+
+    wallyFileRef.current = null;
+    setShouldSubmit(false);
+  };
 
   // handles selecting an emotion from the dropdown menu, once emotion is set in state, should submit the message
   // once message is ready to be submitted, save that message to the db
@@ -191,34 +221,64 @@ export default function ChatHome() {
     setShouldSubmit(true);
   };
 
-  // useEffect to handle submitting the message once shouldSubmit is set to true
+  // handles input changes in the textarea
+  const [userInput, setUserInput] = useState("");
+
+  // send userInput to /api/chat on shouldSubmit == true
   useEffect(() => {
-    if (shouldSubmit && chatId && input) {
-      const userMessage = input;
-
-      // file to be saved to db if it exists
-      const file = wallyFileRef.current;
-
-      // try saving user message to db before calling handleSubmit()
-      void saveMessageMutation.mutate({
-        chatId: chatId,
-        content: userMessage,
-        messageBy: "USER",
-        files: file ? [file] : [],
-      });
-
-      console.log("Finished saving user message: ", userMessage);
-
-      // pass the file to the handleSubmit function
-      handleSubmit(undefined, {
-        experimental_attachments: file ? [file] : undefined,
-      });
-
-      // reset file ref and set shouldSubmit to false
-      wallyFileRef.current = null;
-      setShouldSubmit(false);
+    if (shouldSubmit) {
+      const trimmed = userInput.trim();
+      if (trimmed) {
+        handleSubmit(trimmed);
+        setUserInput("");
+      }
     }
-  }, [shouldSubmit, handleSubmit, chatId, input, saveMessageMutation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldSubmit]);
+
+  // When streamDone flips, save each of the 3 assistant replies…
+  useEffect(() => {
+    if (!streamDone) return;
+
+    messageStreams.forEach((stream) => {
+      const text = stream.chunks.join("");
+      saveMessageMutation.mutate({
+        chatId: chatId!,
+        content: text,
+        messageBy: "WALLY",
+        files: [],
+      });
+    });
+
+    setStreamDone(false);
+  }, [streamDone, messageStreams, saveMessageMutation, chatId]);
+
+  // auto‑resize the textarea to fit content, see how this works with the UI
+  // const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // useEffect(() => {
+  //   const ta = textareaRef.current;
+  //   if (!ta) return;
+  //   ta.style.height = "auto";
+  //   ta.style.height = ta.scrollHeight + "px";
+  // }, [userInput]);
+
+  // send userInput to /api/chat on Enter key press
+  // const handleKeyDown = (e: React.KeyboardEvent) => {
+  //   if (e.key === "Enter" && !e.shiftKey) {
+  //     e.preventDefault();
+  //     const trimmed = userInput.trim();
+  //     if (trimmed) {
+  //       handleSubmit(trimmed);
+  //       setUserInput("");
+  //     }
+  //   }
+  // };
+
+  // scroll to the bottom of the chat when messages change
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [scrollRef, messages]);
 
   return (
     // DIVIDE into components once ui is decided -> components take in heart level as input and return ui accordingly
@@ -269,6 +329,24 @@ export default function ChatHome() {
           </ChatMessage>
         ))}
         {/* {status == "streaming" && <ChatMessage>...</ChatMessage>} */}
+        {/* map each streamMessage to its own dropdown item component */}
+        {messageStreams.map((stream) => (
+          <div key={stream.id}>
+            {stream.chunks.length > 0 && (
+              <ChatMessage isUser={false}>
+                {stream.chunks.map((chunk, ci) => (
+                  <div
+                    key={`${stream.id}-${ci}`}
+                    className="prose max-w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: marked(chunk),
+                    }}
+                  ></div>
+                ))}
+              </ChatMessage>
+            )}
+          </div>
+        ))}
       </ScrollArea>
       <div className="mx-auto flex w-[65vw] flex-col gap-0">
         <UploadDropzone
@@ -309,55 +387,36 @@ export default function ChatHome() {
               className="w-full resize-none border-none bg-inherit p-4 focus:outline-none sm:text-sm"
               rows={1}
               placeholder="Send a Message to Wally"
-              value={input}
-              onChange={handleInputChange}
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
             ></textarea>
             <div className="flex items-center gap-2 p-4">
-              {(status === "submitted" || status === "streaming") && (
-                <Button onClick={stop} variant="main">
-                  <StopCircle />
-                </Button>
-              )}
-              {status === "ready" && (
-                <>
-                  {/* <UploadButton
-                    className="ut-button:bg-amberTheme ut-button:ut-readying:bg-amberTheme/50 ut-button:ut-uploading:bg-amberTheme/50"
-                    endpoint="imageUploader"
-                    onClientUploadComplete={(res) => {
-                      console.log("Files: ", res);
-                      toast.success("Image uploaded successfully");
-                    }}
-                    onUploadError={(error: Error) => {
-                      console.log("Error uploading image: ", error);
-                      toast.error("Error uploading image");
-                    }}
-                  /> */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="main" className="text-md h-11">
-                        Send
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuLabel>Emotions</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {emotions.map((e) => {
-                        return (
-                          <DropdownMenuItem
-                            key={e.emotion}
-                            onClick={() => {
-                              handleEmotionSubmit(e.emotion);
-                            }}
-                          >
-                            {e.emotion}
-                            <span>{e.emoji}</span>
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </>
-              )}
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="main" className="text-md h-11">
+                      Send
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Emotions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {emotions.map((e) => {
+                      return (
+                        <DropdownMenuItem
+                          key={e.emotion}
+                          onClick={() => {
+                            handleEmotionSubmit(e.emotion);
+                          }}
+                        >
+                          {e.emotion}
+                          <span>{e.emoji}</span>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             </div>
           </ShineBorder>
         </div>

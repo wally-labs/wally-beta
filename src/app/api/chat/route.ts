@@ -2,78 +2,70 @@ import "server-only";
 
 import type z from "zod";
 import { type formSchema } from "~/app/_components/schema";
-import { openai } from "@ai-sdk/openai";
-import { smoothStream, streamText } from "ai";
-import type { LanguageModelV1, UIMessage, TextStreamPart, ToolSet } from "ai";
+// import { smoothStream, streamText } from "ai";
 import { type NextRequest } from "next/server";
-// import { type IncomingMessage, type ServerResponse } from "http";
-
-// FOR STREAM OBJECT
-// const openAiElement = z.object({
-//   type: z.string().describe("the html tag of the message"),
-//   text: z.string().describe("the text content of the message"),
-// });
-
-// const openAiSchema = z.object({
-//   elements: openAiElement.array(),
-// });
+import OpenAI from "openai";
+import type { Message } from "~/app/_components/chat/chat-home";
+import type {
+  ChatCompletionAssistantMessageParam,
+  ChatCompletionContentPartImage,
+  ChatCompletionContentPartText,
+  ChatCompletionMessageParam,
+  ChatCompletionUserMessageParam,
+} from "openai/resources/index.mjs";
 
 // smooth streaming for chinese characters
-const chineseSplitter = smoothStream({
-  chunking: /[\u4E00-\u9FFF]|\S+\s+/,
-});
+// const chineseSplitter = smoothStream({
+//   chunking: /[\u4E00-\u9FFF]|\S+\s+/,
+// });
 
 // wrap chineseSplitter in custom stream
-const mixedLangTransform = () => {
-  // create the smooth‐stream instance
-  const transformer = chineseSplitter({ tools: {} });
-  const { readable, writable } = transformer;
+// const mixedLangTransform = () => {
+//   // create the smooth‐stream instance
+//   const transformer = chineseSplitter({ tools: {} });
+//   const { readable, writable } = transformer;
 
-  return new TransformStream<TextStreamPart<ToolSet>, TextStreamPart<ToolSet>>({
-    async transform(part, controller) {
-      const text = part.type ?? "";
-      if (/[\u4E00-\u9FFF]/.test(text)) {
-        // send through chinese splitter writable
-        const writer = writable.getWriter();
-        await writer.write(part);
-        writer.releaseLock();
+//   return new TransformStream<TextStreamPart<ToolSet>, TextStreamPart<ToolSet>>({
+//     async transform(part, controller) {
+//       const text = part.type ?? "";
+//       if (/[\u4E00-\u9FFF]/.test(text)) {
+//         // send through chinese splitter writable
+//         const writer = writable.getWriter();
+//         await writer.write(part);
+//         writer.releaseLock();
 
-        // pull smoothed chunks from the readable stream
-        const reader = readable.getReader();
-        try {
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            controller.enqueue(value);
-          }
-        } finally {
-          reader.releaseLock();
-        }
-      } else {
-        // english or non‐chinese chunks: emit immediately
-        controller.enqueue(part);
-      }
-    },
-  });
-};
+//         // pull smoothed chunks from the readable stream
+//         const reader = readable.getReader();
+//         try {
+//           while (true) {
+//             const { value, done } = await reader.read();
+//             if (done) break;
+//             controller.enqueue(value);
+//           }
+//         } finally {
+//           reader.releaseLock();
+//         }
+//       } else {
+//         // english or non‐chinese chunks: emit immediately
+//         controller.enqueue(part);
+//       }
+//     },
+//   });
+// };
+
+const client = new OpenAI();
 
 export async function POST(req: NextRequest) {
-  const model: LanguageModelV1 = openai(
-    // "ft:gpt-4o-mini-2024-07-18:personal:wally:BAqpHxk2", // training dataset #1 - 75 convos
-    // "ft:gpt-4o-mini-2024-07-18:personal:wally:BArfmkN1", // training dataset #1 - 25 convos
-    "gpt-4o-mini-2024-07-18",
-  );
-
   const {
     messages,
     emotion,
     profileData,
   }: {
-    messages: UIMessage[];
+    messages: Message[];
     emotion: string;
     profileData: z.infer<typeof formSchema>;
   } = (await req.json()) as {
-    messages: UIMessage[];
+    messages: Message[];
     emotion: string;
     profileData: z.infer<typeof formSchema>;
   };
@@ -103,53 +95,67 @@ export async function POST(req: NextRequest) {
   const emotionPrompt = `The user is currently feeling ${emotion}. Tailor your responses to be more empathetic towards
   the user's current emotional state.`;
 
-  // TRY STREAM OBJECT!!!
-  // const result = streamObject({
-  //   model: model,
-  //   output: "array",
-  //   schema: openAiSchema,
-  //   schemaName: "Wally Relationship Assistant Response",
-  //   schemaDescription:
-  //     "A message object with type (h1, h2, h3, p, etc.) and text.",
-  //   messages: [
-  //     {
-  //       role: "system",
-  //       content: systemPrompt + " " + contextPrompt + " " + emotionPrompt,
-  //     },
-  //     ...messages,
-  //   ],
-  // });
+  const ccMessages: ChatCompletionMessageParam[] = messages.map((m) => {
+    // no attachments, only send text
+    if (!m.experimental_attachments?.length) {
+      if (m.role === "user") {
+        const userMsg: ChatCompletionUserMessageParam = {
+          role: "user",
+          content: m.content,
+        };
+        return userMsg;
+      } else {
+        // assistant message will NEVER have attachments
+        const assistantMsg: ChatCompletionAssistantMessageParam = {
+          role: "assistant",
+          content: m.content,
+        };
+        return assistantMsg;
+      }
+    }
 
-  // return result.toTextStreamResponse({
-  //   status: 200
-  // });
+    const textPart: ChatCompletionContentPartText = {
+      type: "text",
+      text: m.content,
+    };
 
-  // STREAM TEXT
-  const result = streamText({
-    model: model,
+    // if attachments we build a mixed content array
+    const imageParts: ChatCompletionContentPartImage[] = [
+      // then each image_url part (detail omitted → defaults to "auto")
+      ...m.experimental_attachments.map((att) => ({
+        type: "image_url" as const,
+        image_url: { url: att.url },
+      })),
+    ];
+
+    const userMsg: ChatCompletionUserMessageParam = {
+      role: "user",
+      content: [textPart, ...imageParts],
+    };
+    return userMsg;
+  });
+
+  console.log("ccMessages", ccMessages);
+
+  // use chat completions API
+  const response = await client.chat.completions.create({
+    // try responses API, if more time in future (for advanced features)
+    // const response = await client.responses.create({
+    model: "gpt-4o-mini-2024-07-18",
+    n: 3,
     messages: [
       {
         role: "system",
         content: systemPrompt + " " + contextPrompt + " " + emotionPrompt,
       },
-      ...messages,
+      ...ccMessages,
     ],
-    experimental_transform: mixedLangTransform,
+    stream: true,
   });
 
-  return result.toDataStreamResponse({
-    getErrorMessage: (error) => {
-      if (error == null) {
-        return "Unknown error occurred.";
-      }
-      if (typeof error === "string") {
-        return error;
-      }
-      if (error instanceof Error) {
-        return error.message;
-      }
-      return JSON.stringify(error);
+  return new Response(response.toReadableStream(), {
+    headers: {
+      "Content-Type": "text/event-stream",
     },
-    sendUsage: false,
   });
 }
