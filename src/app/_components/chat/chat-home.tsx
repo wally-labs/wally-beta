@@ -135,32 +135,70 @@ export default function ChatHome() {
   // flag that checks if the stream is finished
   const [streamDone, setStreamDone] = useState(false);
 
-  // SSE reader to split by choices.index
-  const startStream = () => {
-    const evtSrc = new EventSource("/api/chat", { withCredentials: true });
+  // helper that turns fetch Response into parsed SSE “data” events
+  async function startStreaming(res: Response) {
+    if (!res.ok || !res.body) {
+      console.error("Chat API error", await res.text());
+      return;
+    }
 
-    evtSrc.onmessage = (e) => {
-      if (e.data === "[DONE]") {
-        evtSrc.close();
-        setStreamDone(true);
-        return;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      // accumulate text
+      buffer += decoder.decode(value, { stream: true });
+
+      // split into full SSE blocks (`\n\n` delimits events)
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop()!; // last chunk may be incomplete—keep it for next round
+
+      for (const part of parts) {
+        // each `part` looks like:
+        //   data: {"choices":[{...}]}
+        const lines = part.split(/\r?\n/);
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+
+          const payload = line.slice(5).trim();
+          if (payload === "[DONE]") {
+            return; // stream finished
+          }
+
+          // parse the JSON chunk from OpenAI
+          let msg;
+          try {
+            msg = JSON.parse(payload) as {
+              choices: { delta: { content?: string }; index: number }[];
+            };
+          } catch (err) {
+            console.error("SSE parse error", err, payload);
+            continue;
+          }
+
+          // push each choice.delta.content into your streams state
+          for (const choice of msg.choices) {
+            const txt = choice.delta.content;
+            if (!txt) continue;
+
+            setMessageStreams((prev) =>
+              prev.map((s) =>
+                s.id === choice.index
+                  ? { ...s, chunks: [...s.chunks, txt] }
+                  : s,
+              ),
+            );
+          }
+
+          setStreamDone(true);
+        }
       }
-      const payload = JSON.parse(e.data as string) as {
-        choices: { delta: { content?: string }; index: number }[];
-      };
-      for (const choice of payload.choices) {
-        if (!choice.delta.content) continue;
-        setMessageStreams((prev) =>
-          prev.map((s) =>
-            s.id === choice.index
-              ? { ...s, chunks: [...s.chunks, choice.delta.content!] }
-              : s,
-          ),
-        );
-      }
-    };
-    return () => evtSrc.close();
-  };
+    }
+  }
 
   const handleSubmit = async (userInput: string) => {
     if (!shouldSubmit) return;
@@ -175,22 +213,7 @@ export default function ChatHome() {
       files: file ? [file] : [],
     });
 
-    console.log({
-      messages: [
-        ...messages,
-        {
-          id: "random-for-now",
-          content: userInput,
-          role: "user" as const,
-          experimental_attachments: file ? [file] : undefined,
-        },
-      ],
-      emotion: selectedEmotion,
-      chatId, // shorthand for chatId: chatId
-      profileData: chatData,
-    });
-
-    await fetch("/api/chat", {
+    const res = await fetch("/api/chat", {
       method: "POST",
       body: JSON.stringify({
         messages: [
@@ -208,7 +231,7 @@ export default function ChatHome() {
       }),
     });
 
-    startStream();
+    await startStreaming(res);
 
     wallyFileRef.current = null;
     setShouldSubmit(false);
@@ -240,15 +263,17 @@ export default function ChatHome() {
   useEffect(() => {
     if (!streamDone) return;
 
-    messageStreams.forEach((stream) => {
-      const text = stream.chunks.join("");
-      saveMessageMutation.mutate({
-        chatId: chatId!,
-        content: text,
-        messageBy: "WALLY",
-        files: [],
-      });
-    });
+    console.log(messageStreams);
+
+    // messageStreams.forEach((stream) => {
+    //   const text = stream.chunks.join("");
+    //   saveMessageMutation.mutate({
+    //     chatId: chatId!,
+    //     content: text,
+    //     messageBy: "WALLY",
+    //     files: [],
+    //   });
+    // });
 
     setStreamDone(false);
   }, [streamDone, messageStreams, saveMessageMutation, chatId]);
@@ -330,23 +355,20 @@ export default function ChatHome() {
         ))}
         {/* {status == "streaming" && <ChatMessage>...</ChatMessage>} */}
         {/* map each streamMessage to its own dropdown item component */}
-        {messageStreams.map((stream) => (
-          <div key={stream.id}>
-            {stream.chunks.length > 0 && (
-              <ChatMessage isUser={false}>
-                {stream.chunks.map((chunk, ci) => (
-                  <div
-                    key={`${stream.id}-${ci}`}
-                    className="prose max-w-full"
-                    dangerouslySetInnerHTML={{
-                      __html: marked(chunk),
-                    }}
-                  ></div>
-                ))}
-              </ChatMessage>
-            )}
-          </div>
-        ))}
+        {messageStreams.map((stream) => {
+          const fullText = stream.chunks.join("");
+          return (
+            <ChatMessage key={stream.id} isUser={false}>
+              <div
+                key={stream.id}
+                className="prose max-w-full"
+                dangerouslySetInnerHTML={{
+                  __html: marked(fullText ?? ""),
+                }}
+              ></div>
+            </ChatMessage>
+          );
+        })}
       </ScrollArea>
       <div className="mx-auto flex w-[65vw] flex-col gap-0">
         <UploadDropzone

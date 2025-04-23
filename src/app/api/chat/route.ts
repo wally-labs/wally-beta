@@ -135,10 +135,8 @@ export async function POST(req: NextRequest) {
     return userMsg;
   });
 
-  console.log("ccMessages", ccMessages);
-
   // use chat completions API
-  const response = await client.chat.completions.create({
+  const stream = await client.chat.completions.create({
     // try responses API, if more time in future (for advanced features)
     // const response = await client.responses.create({
     model: "gpt-4o-mini-2024-07-18",
@@ -153,9 +151,28 @@ export async function POST(req: NextRequest) {
     stream: true,
   });
 
-  return new Response(response.toReadableStream(), {
+  const body = new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of stream) {
+          // emit each partial OpenAI chunk as an SSE "data:" event
+          controller.enqueue(`data: ${JSON.stringify(chunk)}\n\n`);
+        }
+        // signal end-of-stream
+        controller.enqueue(`data: [DONE]\n\n`);
+      } catch (err) {
+        controller.error(err);
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  // return response with proper headers
+  return new Response(body, {
     headers: {
       "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
     },
   });
 }

@@ -107,6 +107,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [x] update schema to hold messages array + correct message
 - [x] update schema to hold file[]
 - [x] create file model for OpenAI Attachments
+- [ ] save multiple messages to allMessages
 
 </details>
 
@@ -164,7 +165,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [x] able to send image/pdf upload capabilities
 - [ ] implement RAG (data flow issues) + Pinecone
 - [ ] indiv pinecone namespace for each user -> id prefixes for each profile
-- [ ] return multiple responses to user before beta release
+- [x] return multiple responses to user before beta release
 - [ ] add error handling, cancelling & regeneration to UI using vercel SDK
 - [x] optimize speed and payload size
 - [ ] add context window library and tokenizer, figure out embedding
