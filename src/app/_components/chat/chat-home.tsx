@@ -27,6 +27,7 @@ import { marked } from "marked";
 import { UploadDropzone } from "~/lib/uploadthing";
 // import type { Attachment } from "ai";
 import Image from "next/image";
+import { WallyOptions } from "../message/wally-options";
 
 interface Emotion {
   emotion: string;
@@ -53,7 +54,7 @@ type Attachment = {
 };
 
 export type Message = {
-  id: string;
+  id?: string;
   content: string;
   role: "user" | "assistant";
   experimental_attachments?: Attachment[];
@@ -65,6 +66,29 @@ export default function ChatHome() {
 
   // ref object to store the uploaded file, only until file is used for a message
   const wallyFileRef = useRef<Attachment | null>(null);
+
+  // handles input changes in the textarea
+  const [userInput, setUserInput] = useState("");
+
+  // set state of the currently selected emotion (useState to display on frontend in future)
+  const [selectedEmotion, setSelectedEmotion] = useState("");
+
+  // handle openai api call
+  const [shouldSubmit, setShouldSubmit] = useState(false);
+
+  // store all previous messages in state
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  // stream messages from server
+  const [messageStreams, setMessageStreams] = useState([
+    { id: 0, chunks: [] as string[] },
+    { id: 1, chunks: [] as string[] },
+    { id: 2, chunks: [] as string[] },
+  ]);
+
+  // textarea ref to auto‑resize the textarea to fit content
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const MAX_LINES = 5;
 
   // object has the same name as the slug in the URL
   const { chats } = useParams();
@@ -80,11 +104,6 @@ export default function ChatHome() {
   const name = chatData?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
 
-  // set state of the currently selected emotion (useState to display on frontend in future)
-  const [selectedEmotion, setSelectedEmotion] = useState("");
-  // handle openai api call
-  const [shouldSubmit, setShouldSubmit] = useState(false);
-
   // saveMessageMutation
   const saveMessageMutation = api.messages.saveMessage.useMutation({
     onSuccess: () => {
@@ -92,6 +111,16 @@ export default function ChatHome() {
     },
     onError: (error) => {
       console.error("Error saving message: ", error);
+    },
+  });
+
+  // saveWallyMessagesMutation
+  const saveWallyMessagesMutation = api.messages.saveWallyMessages.useMutation({
+    onSuccess: () => {
+      console.log("Wally messages saved to db successfully");
+    },
+    onError: (error) => {
+      console.error("Error saving Wally messages: ", error);
     },
   });
 
@@ -104,9 +133,6 @@ export default function ChatHome() {
       enabled: !!chatId,
     },
   );
-
-  // store all previous messages in state
-  const [messages, setMessages] = useState<Message[]>([]);
 
   // set all messages once fetched from the db
   useEffect(() => {
@@ -124,16 +150,6 @@ export default function ChatHome() {
       setMessages(queriedMessages.reverse());
     }
   }, [dataMessages]);
-
-  // stream messages from server
-  const [messageStreams, setMessageStreams] = useState([
-    { id: 0, chunks: [] as string[] },
-    { id: 1, chunks: [] as string[] },
-    { id: 2, chunks: [] as string[] },
-  ]);
-
-  // flag that checks if the stream is finished
-  const [streamDone, setStreamDone] = useState(false);
 
   // helper that turns fetch Response into parsed SSE “data” events
   async function startStreaming(res: Response) {
@@ -193,13 +209,12 @@ export default function ChatHome() {
               ),
             );
           }
-
-          setStreamDone(true);
         }
       }
     }
   }
 
+  // handle submitting the message to the server
   const handleSubmit = async (userInput: string) => {
     if (!shouldSubmit) return;
 
@@ -213,13 +228,18 @@ export default function ChatHome() {
       files: file ? [file] : [],
     });
 
+    // set user message into messages state (UI)
+    setMessages((prev) => [
+      ...prev,
+      { content: userInput, role: "user" } as Message,
+    ]);
+
     const res = await fetch("/api/chat", {
       method: "POST",
       body: JSON.stringify({
         messages: [
           ...messages,
           {
-            id: "random-for-now",
             content: userInput,
             role: "user",
             experimental_attachments: file ? [file] : undefined,
@@ -244,9 +264,6 @@ export default function ChatHome() {
     setShouldSubmit(true);
   };
 
-  // handles input changes in the textarea
-  const [userInput, setUserInput] = useState("");
-
   // send userInput to /api/chat on shouldSubmit == true
   useEffect(() => {
     if (shouldSubmit) {
@@ -256,49 +273,63 @@ export default function ChatHome() {
         setUserInput("");
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldSubmit]);
 
-  // When streamDone flips, save each of the 3 assistant replies…
+  // send selected message + all other messages to db
+  const onSubmitWallyMessage = (messageId: number) => {
+    // remove toast (in production)
+    toast.success(`Message ${messageId + 1} saved successfully!`);
+
+    const selectedMessage = messageStreams.find((m) => m.id === messageId);
+    if (!selectedMessage) return;
+
+    const selectedMessageContent = selectedMessage.chunks.join("");
+
+    // call saveWallyMessages mutation
+    void saveWallyMessagesMutation.mutate({
+      chatId: chatId!,
+      selectedMessage: {
+        content: selectedMessageContent,
+        messageBy: "WALLY",
+      },
+      messages: messageStreams.map((m) => {
+        return {
+          content: m.chunks.join(""),
+          messageBy: "WALLY",
+        };
+      }),
+    });
+
+    // reset message streams
+    setMessageStreams([
+      { id: 0, chunks: [] as string[] },
+      { id: 1, chunks: [] as string[] },
+      { id: 2, chunks: [] as string[] },
+    ]);
+
+    // set messages state with selected message
+    setMessages((prev) => [
+      ...prev,
+      {
+        content: selectedMessageContent,
+        role: "assistant",
+      },
+    ]);
+  };
+
   useEffect(() => {
-    if (!streamDone) return;
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
 
-    console.log(messageStreams);
+    // compute current line height and max allowable height
+    const lineHeight = parseFloat(getComputedStyle(ta).lineHeight || "0");
+    const maxHeight = lineHeight * MAX_LINES;
 
-    // messageStreams.forEach((stream) => {
-    //   const text = stream.chunks.join("");
-    //   saveMessageMutation.mutate({
-    //     chatId: chatId!,
-    //     content: text,
-    //     messageBy: "WALLY",
-    //     files: [],
-    //   });
-    // });
-
-    setStreamDone(false);
-  }, [streamDone, messageStreams, saveMessageMutation, chatId]);
-
-  // auto‑resize the textarea to fit content, see how this works with the UI
-  // const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // useEffect(() => {
-  //   const ta = textareaRef.current;
-  //   if (!ta) return;
-  //   ta.style.height = "auto";
-  //   ta.style.height = ta.scrollHeight + "px";
-  // }, [userInput]);
-
-  // send userInput to /api/chat on Enter key press
-  // const handleKeyDown = (e: React.KeyboardEvent) => {
-  //   if (e.key === "Enter" && !e.shiftKey) {
-  //     e.preventDefault();
-  //     const trimmed = userInput.trim();
-  //     if (trimmed) {
-  //       handleSubmit(trimmed);
-  //       setUserInput("");
-  //     }
-  //   }
-  // };
+    // clamp new height to min[scrollHeight, maxHeight]
+    const newHeight = Math.min(ta.scrollHeight, maxHeight);
+    ta.style.height = `${newHeight}px`;
+  }, [userInput]);
 
   // scroll to the bottom of the chat when messages change
   useEffect(() => {
@@ -345,30 +376,49 @@ export default function ChatHome() {
               ))}
             <div
               key={mi}
-              className="prose max-w-full"
+              className="max-w-full"
               dangerouslySetInnerHTML={{
-                __html: marked(message.content ?? ""),
+                __html: marked(message.content),
               }}
             ></div>
-            <div ref={scrollRef} />
           </ChatMessage>
         ))}
-        {/* {status == "streaming" && <ChatMessage>...</ChatMessage>} */}
         {/* map each streamMessage to its own dropdown item component */}
-        {messageStreams.map((stream) => {
-          const fullText = stream.chunks.join("");
-          return (
-            <ChatMessage key={stream.id} isUser={false}>
-              <div
+        {messageStreams[0] && messageStreams[0].chunks.length > 0 && (
+          <div className="flex items-center justify-center">
+            <span className="text-sm text-gray-500">
+              Choose your favourite response from the options below!
+            </span>
+          </div>
+        )}
+        {messageStreams
+          .map((stream) =>
+            stream.chunks.length > 0
+              ? { id: stream.id, content: stream.chunks.join("") }
+              : null,
+          )
+          .map((stream) => {
+            if (!stream?.content) return null;
+            return (
+              <button
                 key={stream.id}
-                className="prose max-w-full"
-                dangerouslySetInnerHTML={{
-                  __html: marked(fullText ?? ""),
-                }}
-              ></div>
-            </ChatMessage>
-          );
-        })}
+                type="button"
+                onClick={() => onSubmitWallyMessage(stream.id)}
+                className="w-full text-left"
+              >
+                <WallyOptions key={stream.id}>
+                  <div
+                    key={stream.id}
+                    className="max-w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: marked(stream.content),
+                    }}
+                  ></div>
+                </WallyOptions>
+              </button>
+            );
+          })}
+        <div ref={scrollRef} />
       </ScrollArea>
       <div className="mx-auto flex w-[65vw] flex-col gap-0">
         <UploadDropzone
@@ -406,13 +456,14 @@ export default function ChatHome() {
           >
             <textarea
               id="newMessage"
-              className="w-full resize-none border-none bg-inherit p-4 focus:outline-none sm:text-sm"
-              rows={1}
+              className="w-full resize-none border-none bg-inherit px-4 focus:outline-none sm:text-sm"
               placeholder="Send a Message to Wally"
+              rows={1}
               value={userInput}
+              ref={textareaRef}
               onChange={(e) => setUserInput(e.target.value)}
             ></textarea>
-            <div className="flex items-center gap-2 p-4">
+            <div className="flex items-center gap-2">
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
