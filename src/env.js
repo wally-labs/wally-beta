@@ -12,13 +12,14 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
-    AUTH_DISCORD_ID: z.string().optional().nullable(),
-    AUTH_DISCORD_SECRET: z.string().optional().nullable(),
-    GOOGLE_ID: z.string().optional().nullable(),
-    GOOGLE_SECRET: z.string().optional().nullable(),
+    AUTH_DISCORD_ID: z.string().optional(),
+    AUTH_DISCORD_SECRET: z.string().optional(),
+    AUTH_GOOGLE_ID: z.string().optional(),
+    AUTH_GOOGLE_SECRET: z.string().optional(),
     POSTGRES_URL: z.string().url(),
     PINECONE_API_KEY: z.string(),
     OPENAI_API_KEY: z.string(),
+    CLERK_SIGNING_SECRET: z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -41,11 +42,12 @@ export const env = createEnv({
     AUTH_SECRET: process.env.AUTH_SECRET,
     AUTH_DISCORD_ID: process.env.AUTH_DISCORD_ID ?? undefined,
     AUTH_DISCORD_SECRET: process.env.AUTH_DISCORD_SECRET ?? undefined,
-    GOOGLE_ID: process.env.AUTH_GOOGLE_ID ?? undefined,
-    GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET ?? undefined,
+    AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID ?? undefined,
+    AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET ?? undefined,
     POSTGRES_URL: process.env.POSTGRES_URL,
     PINECONE_API_KEY: process.env.PINECONE_API_KEY,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    CLERK_SIGNING_SECRET: process.env.SIGNING_SECRET,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

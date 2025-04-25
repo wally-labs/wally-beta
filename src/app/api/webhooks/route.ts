@@ -2,6 +2,7 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import type { WebhookEvent } from "@clerk/nextjs/server";
 import { api } from "~/trpc/server";
+import { env } from "~/env";
 
 interface EmailVerification {
   status: string;
@@ -53,7 +54,7 @@ interface ClerkWebhookPayload {
 }
 
 export async function POST(req: Request) {
-  const SIGNING_SECRET = process.env.SIGNING_SECRET;
+  const SIGNING_SECRET = env.CLERK_SIGNING_SECRET;
 
   if (!SIGNING_SECRET) {
     throw new Error(
