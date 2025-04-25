@@ -196,9 +196,19 @@ export default function ChatHome() {
             continue;
           }
 
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          if (!msg.choices) {
+            console.warn("No choices in payload: ", msg);
+            continue;
+          }
+
+          const choices = Array.isArray(msg.choices)
+            ? msg.choices
+            : [msg.choices];
+
           // push each choice.delta.content into your streams state
-          for (const choice of msg.choices) {
-            const txt = choice.delta.content;
+          for (const choice of choices) {
+            const txt = choice.delta?.content;
             if (!txt) continue;
 
             setMessageStreams((prev) =>
@@ -231,7 +241,11 @@ export default function ChatHome() {
     // set user message into messages state (UI)
     setMessages((prev) => [
       ...prev,
-      { content: userInput, role: "user" } as Message,
+      {
+        content: userInput,
+        role: "user",
+        experimental_attachments: file ? [file] : [],
+      } as Message,
     ]);
 
     const res = await fetch("/api/chat", {
@@ -269,10 +283,11 @@ export default function ChatHome() {
     if (shouldSubmit) {
       const trimmed = userInput.trim();
       if (trimmed) {
-        handleSubmit(trimmed);
+        void handleSubmit(trimmed);
         setUserInput("");
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldSubmit]);
 
   // send selected message + all other messages to db
@@ -422,7 +437,7 @@ export default function ChatHome() {
       </ScrollArea>
       <div className="mx-auto flex w-[65vw] flex-col gap-0">
         <UploadDropzone
-          className="ut-allowed-content:hidden ut-label:text-amberTheme ut-uploading:ut-label:text-amberTheme-darker relative m-0 max-h-[30px] w-full overflow-visible rounded-b-none border-b-0 bg-gray-100/50 p-0"
+          className="relative m-0 max-h-[30px] w-full overflow-visible rounded-b-none border-b-0 bg-gray-100/50 p-0 ut-allowed-content:hidden ut-label:text-amberTheme ut-uploading:ut-label:text-amberTheme-darker"
           endpoint="imageUploader"
           config={{
             mode: "auto",

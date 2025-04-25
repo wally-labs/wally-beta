@@ -53,6 +53,7 @@ import type {
 //   });
 // };
 
+const NUM_STREAMS = 3;
 const client = new OpenAI();
 
 export async function POST(req: NextRequest) {
@@ -121,7 +122,7 @@ export async function POST(req: NextRequest) {
 
     // if attachments we build a mixed content array
     const imageParts: ChatCompletionContentPartImage[] = [
-      // then each image_url part (detail omitted → defaults to "auto")
+      // then each image_url part (detail omitted - defaults to "auto")
       ...m.experimental_attachments.map((att) => ({
         type: "image_url" as const,
         image_url: { url: att.url },
@@ -132,33 +133,93 @@ export async function POST(req: NextRequest) {
       role: "user",
       content: [textPart, ...imageParts],
     };
+
     return userMsg;
   });
 
   // use chat completions API
-  const stream = await client.chat.completions.create({
-    // try responses API, if more time in future (for advanced features)
-    // const response = await client.responses.create({
-    model: "gpt-4o-mini-2024-07-18",
-    n: 3,
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt + " " + contextPrompt + " " + emotionPrompt,
-      },
-      ...ccMessages,
-    ],
-    stream: true,
-  });
+  // const stream = await client.chat.completions.create({
+  //   // try responses API, if more time in future (for advanced features)
+  //   // const response = await client.responses.create({
+  //   model: "gpt-4o-mini-2024-07-18",
+  //   n: 3,
+  //   messages: [
+  //     {
+  //       role: "system",
+  //       content: systemPrompt + " " + contextPrompt + " " + emotionPrompt,
+  //     },
+  //     ...ccMessages,
+  //   ],
+  //   stream: true,
+  // });
 
+  // n:3 results in multi-modal streaming error, when using images
+  // instead of one n:3 request, create 3 n:1 parallel streams
+  const streamsWithIndex = await Promise.all(
+    Array.from({ length: NUM_STREAMS }, (_, idx) =>
+      client.chat.completions
+        .create({
+          model: "gpt-4o-mini-2024-07-18",
+          n: 1,
+          stream: true,
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt + " " + contextPrompt + " " + emotionPrompt,
+            },
+            ...ccMessages,
+          ],
+        })
+        .then((stream) => ({ stream, idx })),
+    ),
+  );
+
+  // wrap all in one ReadableStream with interleaved streams, similar to 1 n:3 request response
   const body = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of stream) {
-          // emit each partial OpenAI chunk as an SSE "data:" event
-          controller.enqueue(`data: ${JSON.stringify(chunk)}\n\n`);
+        // turn each stream into async iterators, keep its index
+        let activeStreams = streamsWithIndex.map(({ stream, idx }) => {
+          const iter = stream[Symbol.asyncIterator]();
+          const next = iter.next().then((result) => ({ result, idx, iter }));
+          return { iter, idx, next };
+        });
+
+        // as long as we have active iterators
+        while (activeStreams.length > 0) {
+          // await whichever stream's next resolves first
+          const { result, idx, iter } = await Promise.race(
+            activeStreams.map((s) => s.next),
+          );
+
+          if (result.done) {
+            // remove finished stream from active streams
+            activeStreams = activeStreams.filter((s) => s.iter !== iter);
+          } else {
+            // repackage single-delta into multi-choice format
+            const delta = result.value.choices[0]?.delta;
+            const fauxPayload = {
+              choices: [{ delta, index: idx }],
+            };
+
+            controller.enqueue(`data: ${JSON.stringify(fauxPayload)}\n\n`);
+
+            // re-queue the next stream's next promise
+            activeStreams = activeStreams.map((s) => {
+              if (s.iter === iter) {
+                return {
+                  iter,
+                  idx,
+                  next: iter.next().then((r) => ({ result: r, idx, iter })),
+                };
+              }
+
+              return s;
+            });
+          }
         }
-        // signal end-of-stream
+
+        // signal end-of-stream, once all 3 streams are done
         controller.enqueue(`data: [DONE]\n\n`);
       } catch (err) {
         controller.error(err);
@@ -168,7 +229,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // return response with proper headers
+  // return response with headers
   return new Response(body, {
     headers: {
       "Content-Type": "text/event-stream",
