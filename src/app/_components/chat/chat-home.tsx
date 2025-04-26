@@ -1,12 +1,11 @@
 "use client";
 
-import { Heart, StopCircle } from "lucide-react";
+import { Heart } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { skipToken } from "@tanstack/react-query";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState } from "react";
 import ShineBorder from "@components/ui/shine-border";
 import {
