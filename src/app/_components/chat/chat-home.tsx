@@ -1,6 +1,6 @@
 "use client";
 
-import { Aperture, Heart, StopCircle } from "lucide-react";
+import { Heart, StopCircle } from "lucide-react";
 import { ChatMessage } from "~/app/_components/message/chat-message";
 import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
@@ -272,7 +272,7 @@ export default function ChatHome() {
       </ScrollArea>
       <div className="mx-auto flex w-[65vw] flex-col gap-0">
         <UploadDropzone
-          className="ut-allowed-content:hidden ut-label:text-amberTheme ut-uploading:ut-label:text-amberTheme-darker relative m-0 max-h-[30px] w-full overflow-visible rounded-b-none border-b-0 bg-gray-100/50 p-0"
+          className="relative m-0 max-h-[30px] w-full overflow-visible rounded-b-none border-b-0 bg-gray-100/50 p-0 ut-allowed-content:hidden ut-label:text-amberTheme ut-uploading:ut-label:text-amberTheme-darker"
           endpoint="imageUploader"
           config={{
             mode: "auto",
