@@ -1,16 +1,10 @@
 "use client";
 
-import { UserCircle2 } from "lucide-react";
-
 interface ChatMessageProps {
   children: React.ReactNode;
-  isUser?: boolean;
 }
 
-export const WallyOptions: React.FC<ChatMessageProps> = ({
-  children,
-  isUser = false,
-}) => {
+export const WallyOptions: React.FC<ChatMessageProps> = ({ children }) => {
   return (
     <div className={"flex flex-row items-start space-x-3 p-4"}>
       {/* {!isUser && <UserCircle2 className="h-8 min-h-8 w-8 min-w-8" />} */}
