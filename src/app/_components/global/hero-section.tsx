@@ -1,7 +1,6 @@
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { ModelDropdown } from "./model-dropdown";
 import { SidebarTrigger } from "@components/ui/sidebar";
-import { Button } from "@components/ui/button";
+import ClerkComponent from "./clerk-component";
 
 export function HeroSection({
   children,
@@ -22,14 +21,7 @@ export function HeroSection({
           <ModelDropdown />
         </div>
         <div className="space-x-4">
-          <SignedOut>
-            <SignInButton>
-              <Button variant="main">Sign In</Button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+          <ClerkComponent />
         </div>
       </div>
       <div className="mt-4">{children}</div>
