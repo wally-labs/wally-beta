@@ -9,6 +9,8 @@ import Home from "~/app/_components/global/home";
 
 import { SidebarProvider } from "@components/ui/sidebar";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import JotaiProvider from "./_components/jotai-provider";
 
 export const metadata: Metadata = {
@@ -29,10 +31,12 @@ export default function RootLayout({
             <JotaiProvider>
               <SidebarProvider>
                 <Home>{children}</Home>
-                <Toaster />
               </SidebarProvider>
             </JotaiProvider>
           </TRPCReactProvider>
+          <Toaster />
+          <Analytics />
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
