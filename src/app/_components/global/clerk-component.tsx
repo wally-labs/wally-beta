@@ -12,14 +12,12 @@ import { useEffect } from "react";
 
 export default function ClerkComponent() {
   // this component is used to render the sign in button and user button
-  const user = useUser();
+  const { user } = useUser();
   const setChatData = useSetAtom(chatDataAtom);
 
   useEffect(() => {
-    console.log("User changed:", user);
-    // when user flips to null, clear chat data
-    if (user.user === null) {
-      localStorage.removeItem("chatDataAtoms");
+    if (user === null) {
+      sessionStorage.removeItem("wally:chatData");
       setChatData([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

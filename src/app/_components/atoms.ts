@@ -1,11 +1,12 @@
 "use client";
 
-import { atomWithStorage } from "jotai/utils";
+import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { type z } from "zod";
 import { type formSchema } from "./schema";
 import { focusAtom } from "jotai-optics";
-import type { Atom } from "jotai";
+import { type Atom } from "jotai";
 import { useMemo } from "react";
+import { type SyncStorage } from "jotai/vanilla/utils/atomWithStorage";
 
 export type chatDataSchema = {
   id: string;
@@ -15,16 +16,14 @@ export type chatDataSchema = {
 };
 
 // Ensure we have access to sessionStorage only in a client environment:
-// const storage: SyncStorage<Value> = () => {
-//   if (typeof window === "undefined") {
-//     return undefined;
-//   }
-//   return createJSONStorage(() => sessionStorage);
-// };
+const myStorage: SyncStorage<chatDataSchema[]> = createJSONStorage(
+  () => sessionStorage,
+);
 
 export const chatDataAtom = atomWithStorage(
-  "chatDataAtoms",
+  "wally:chatData",
   [] as chatDataSchema[],
+  myStorage,
 );
 
 export function useCurrentChatData(chatId: string): Atom<chatDataSchema> {
