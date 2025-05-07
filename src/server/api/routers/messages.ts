@@ -141,4 +141,52 @@ export const messagesRouter = createTRPCRouter({
         });
       }
     }),
+
+  // save all of Wally's replies to db, inludes all messages + selected message
+  saveWallyMessages: protectedProcedure
+    .input(
+      z.object({
+        chatId: z.string(),
+        selectedMessage: z.object({
+          content: z.string(),
+          messageBy: z.enum(["USER", "WALLY"]),
+        }),
+        messages: z.array(
+          z.object({
+            content: z.string(),
+            messageBy: z.enum(["USER", "WALLY"]),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { chatId, messages } = input;
+
+      try {
+        // update chat's updatedAt with the chatId
+        await ctx.db.chat.update({
+          where: { id: chatId },
+          data: {
+            updatedAt: new Date(),
+          },
+        });
+
+        const message = await ctx.db.message.create({
+          data: {
+            chatId,
+            content: input.selectedMessage.content,
+            messageBy: "WALLY",
+            allMessages: messages.map((msg) => msg.content),
+          },
+        });
+
+        return message;
+      } catch (error) {
+        console.error("Error saving Wally messages: ", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to save Wally messages",
+        });
+      }
+    }),
 });

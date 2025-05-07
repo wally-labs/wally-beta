@@ -77,26 +77,27 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [x] create update profile dialog box component
 - [x] create one form component to be used across create-profile and update-profile
 - [x] map each message from openai/user message to a chatmessage component, and improve scrollbox
-- [ ] link user(?) session to jotai state (currently using localStorage)
-- [x] add image/pdf upload functionality (uploads from device)
+- [x] add image/pdf upload functionality (currently from device)
   - [x] display file selected (if image) on frontend
   - [ ] display file selected in dropzone
   - [ ] figure out how to delete file from frontend
-- [ ] add image/pdf upload functionality (from drive/dropbox etc.)
-- [ ] update frontEnd to show 3 different dropdowns for responses
-- [ ] updateProfile display (birthdate and heartLevel does not render default value)
+  - [ ] add image/pdf upload functionality (from drive/dropbox etc.)
+- [x] update frontEnd to show 3 different dropdowns for responses
 - [ ] display currently selected emotion on frontend
+- [ ] updateProfile display (birthdate and heartLevel does not render default value)
+- [ ] link user(?) session to jotai state (currently using localStorage)
 
 </details>
 
 <details>
   <summary><strong>UI/UX</strong></summary>
 
-- [ ] make sure ui for all pages is exactly 100vh
+- [ ] make sure ui for all pages is exactly 100vh (on all devices!)
 - [ ] fix create-chat page ui (languages currently greyed out)
 - [ ] make sure scroll area in chat page sticks to the bottom
 - [ ] chat area has a down button to scroll down
-- [ ] make ui mobile friendly (mainly sidebar)
+- [ ] fix scrollRef, make sure page scrolls down all the way when messageStreams render
+- [ ] make entire ui mobile friendly
 
 </details>
 
@@ -107,6 +108,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [x] update schema to hold messages array + correct message
 - [x] update schema to hold file[]
 - [x] create file model for OpenAI Attachments
+- [x] save multiple messages to allMessages
 
 </details>
 
@@ -121,10 +123,10 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [x] update clerk webhooks to send data to vercel db (for production do manually depending on external account)
 - [x] procedure to update chats's updatedAt (arrange chats by updatedAt, not createdAt)
 - [x] save message to db (including files, optional)
+- [x] procedure to add allMessages array to db, use current message route for correct message only
 - [ ] convert all restricted value fields to enums
 - [ ] update config.ts/index.ts and src/api/auth (not for demo, read up!)
 - [ ] convert to personal providers for auth, before launch
-- [ ] procedure to add allMessages array to db, use current message route for correct message only
 - [ ] rate limits to each user on number of api calls (per month/day..)
 - [ ] use httpbatchstreamlink to stream trpc calls
 
@@ -164,7 +166,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [x] able to send image/pdf upload capabilities
 - [ ] implement RAG (data flow issues) + Pinecone
 - [ ] indiv pinecone namespace for each user -> id prefixes for each profile
-- [ ] return multiple responses to user before beta release
+- [x] return multiple responses to user before beta release
 - [ ] add error handling, cancelling & regeneration to UI using vercel SDK
 - [x] optimize speed and payload size
 - [ ] add context window library and tokenizer, figure out embedding
