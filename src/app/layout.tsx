@@ -35,8 +35,8 @@ export default function RootLayout({
             </JotaiProvider>
           </TRPCReactProvider>
           <Toaster />
-          <Analytics />
           <SpeedInsights />
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
