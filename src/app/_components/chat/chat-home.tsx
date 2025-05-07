@@ -390,9 +390,9 @@ export default function ChatHome() {
               ))}
             <div
               key={mi}
-              className="max-w-full"
+              className="max-w-full whitespace-pre-wrap"
               dangerouslySetInnerHTML={{
-                __html: marked(message.content),
+                __html: marked(message.content ?? ""),
               }}
             ></div>
           </ChatMessage>
