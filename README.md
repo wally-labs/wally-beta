@@ -65,7 +65,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 ## TO-DO LIST
 
 <details>
-  <summary><strong>Front-End</strong><summary>
+  <summary><strong>Front-End</strong></summary>
 
 - [x] create home/chat/login pages
 - [x] personify home page (can be improved) - more relatable ui
@@ -80,12 +80,12 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 - [x] add image/pdf upload functionality (currently from device)
   - [x] display file selected (if image) on frontend
   - [ ] display file selected in dropzone
-  - [ ] figure out how to delete file from frontend
+  - [ ] figure out delete file flow on frontend
   - [ ] add image/pdf upload functionality (from drive/dropbox etc.)
 - [x] update frontEnd to show 3 different dropdowns for responses
 - [ ] display currently selected emotion on frontend
 - [ ] updateProfile display (birthdate and heartLevel does not render default value)
-- [ ] link user(?) session to jotai state (currently using localStorage)
+- [x] link user sessionStorage to jotai state (previously using localStorage)
 
 </details>
 
@@ -113,7 +113,7 @@ Wally helps couples, friends, or colleagues engage in meaningful offline convers
 </details>
 
 <details>
-  <summary><strong>Auth + tRPC</strong><summary>
+  <summary><strong>Auth + tRPC</strong></summary>
 
 - [x] fix login page ui (just styling)
 - [x] correct client side auth errors (import session from clerk not next-auth)
