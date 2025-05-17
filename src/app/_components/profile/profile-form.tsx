@@ -141,7 +141,10 @@ export function ProfileForm({
                 <SelectContent>
                   <SelectItem value="family">Family</SelectItem>
                   <SelectItem value="friendship">Friendship</SelectItem>
+                  <SelectItem value="partner">Romantic Partner</SelectItem>
                   <SelectItem value="married">Married</SelectItem>
+                  <SelectItem value="colleague">Colleague</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
