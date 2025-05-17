@@ -46,6 +46,9 @@ const emotions: Emotion[] = [
   { emotion: "neutral", emoji: "😐" },
 ];
 
+const PROFILE_COLORS = ["black", "gold", "orange", "violet", "red"];
+const PROFILE_EMOJIS = ["🧊", "👋", "🤝", "🌹", "❤️"];
+
 export default function ChatHome() {
   // ref object to scroll to the bottom of the chat
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -66,6 +69,8 @@ export default function ChatHome() {
   const relationship = chatData?.relationship;
   const name = chatData?.name;
   const grayHeartLevel = redHeartLevel ? 5 - redHeartLevel : 0;
+  const profileColor = PROFILE_COLORS[redHeartLevel - 1];
+  const profileEmoji = PROFILE_EMOJIS[redHeartLevel - 1];
 
   // set state of the currently selected emotion (useState to display on frontend in future)
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -226,15 +231,20 @@ export default function ChatHome() {
       <div className="flex h-[10%] w-[80%] items-center justify-between space-x-2">
         <div className="flex">
           {Array.from({ length: redHeartLevel }).map((_, i) => (
-            <Heart key={i} className="text-red-500" />
+            <Heart key={i} style={{ color: profileColor }} />
           ))}
           {Array.from({ length: grayHeartLevel }).map((_, i) => (
             <Heart key={i} className="text-gray-500" />
           ))}
         </div>
         <div>
-          <h2 className="text-3xl font-bold text-red-600">{name} 🌹</h2>
-          <h3 className="text-center text-xl font-semibold text-red-600">
+          <h2 className="text-3xl font-bold" style={{ color: profileColor }}>
+            {name} {profileEmoji}
+          </h2>
+          <h3
+            className="text-center text-xl font-semibold"
+            style={{ color: profileColor }}
+          >
             {relationship}
           </h3>
         </div>
