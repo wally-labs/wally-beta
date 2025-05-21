@@ -28,6 +28,9 @@ import { UploadDropzone } from "~/lib/uploadthing";
 import Image from "next/image";
 import { WallyOptions } from "../message/wally-options";
 
+import { env } from "~/envServer";
+console.log(env);
+
 interface Emotion {
   emotion: string;
   emoji: string;
